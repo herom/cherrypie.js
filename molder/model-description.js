@@ -63,6 +63,9 @@ var ModelDescription = {
     /**
      * An *example* computed property which should be populated from
      * any of the origin (JSON) object's "primitive' data type values.
+     * <p>
+     *   The properties `origin` and `namespaceExtractor` are injected
+     *   by the `ModelFactory`.
      *
      * For example:
      * ```
@@ -80,9 +83,9 @@ var ModelDescription = {
      * }
      * ```
      *
-     * @param origin
-     * @param namespaceExtractor
-     * @returns {string}
+     * @param {JSON|Object}             origin              This JSON origin.
+     * @param {Function}                namespaceExtractor  The namespace extractor function of the ModelFactory.
+     * @returns {String}
      */
     statusPhrase: function (origin, namespaceExtractor) {
         var status = namespaceExtractor(origin, 'mood.currentStatus'),
@@ -108,6 +111,9 @@ var ModelDescription = {
      *   nickname: "Batman"
      * }
      * ```
+     * 
+     * @property serializable
+     * @type {Array}
      */
     serializable: ['name', 'nickname']
 };
