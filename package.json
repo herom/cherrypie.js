@@ -1,0 +1,12 @@
+{
+  "name": "Molder",
+  "description": "Populate Model Object from incoming JSON",
+  "author": "Heinz Romirer <h.romirer@gmail.com>",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+	"mocha": "*",
+	"should": "*"
+  },
+  "license": "MIT"
+}
