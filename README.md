@@ -1,5 +1,4 @@
 #JSON-Molder
-========
 Molder is just another model populating model factory which converts your incoming JSON
 object into a simpler model object with the help of a so called model description.
 
