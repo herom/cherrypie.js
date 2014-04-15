@@ -64,9 +64,9 @@ var ModelFactory = {
      * Takes the given origin (JSON/Object) and namespace and returns
      * the namespaced/reduced object.
      *
-     * @param origin
-     * @param namespace
-     * @returns {*}
+     * @param {Object}          origin              The JSON origin.
+     * @param {String}          namespace           The model-description namespace.
+     * @returns {Object}
      * @private
      */
     _extractNamespace: function (origin, namespace) {
