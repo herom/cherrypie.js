@@ -4,7 +4,7 @@ var should = require('should'),
 describe("ModelFactory", function () {
     it("Should return the namespace-reduced origin", function () {
         var origin = {
-                system: {
+                session: {
                     user: {
                         activities: {
                             running: 'hooray'
@@ -12,7 +12,7 @@ describe("ModelFactory", function () {
                     }
                 }
             },
-            namespace = 'system.user.activities',
+            namespace = 'session.user.activities',
             result;
 
         result = ModelFactory._extractNamespace(origin, namespace);
@@ -20,7 +20,7 @@ describe("ModelFactory", function () {
         result.should.have.property('running', 'hooray');
     });
 
-    it("Should return the right properties from String keys", function () {
+    it("Should return 'primitive' properties from String values", function () {
         var response = {
                 system: {
                     env: {
