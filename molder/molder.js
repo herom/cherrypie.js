@@ -1,10 +1,11 @@
 /**
+ * Use the Molder to populate models from an (JSON) origin in an intuitive way.
  *
- * @class ModelFactory
- * @module
+ * @class Molder
+ * @module JSON-Molder
  * @static
  */
-var ModelFactory = {
+var Molder = {
     /**
      * Takes the given model description along with the origin (JSON) object
      * and returns the populated model.
@@ -89,4 +90,4 @@ var ModelFactory = {
     }
 };
 
-module.exports = ModelFactory;
+module.exports = Molder;
