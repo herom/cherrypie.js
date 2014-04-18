@@ -3,6 +3,10 @@
   "description": "Populate Model Object from incoming JSON",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "version": "0.0.1",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "main": "./molder/model-factory",
   "dependencies": {},
   "devDependencies": {
 	"mocha": "*",
