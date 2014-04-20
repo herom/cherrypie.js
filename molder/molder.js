@@ -19,46 +19,44 @@ var Molder = {
         var keys = Object.keys(modelDescription),
             namespaceExtractor = this._extractNamespace,
             preparedOrigin = {},
-            parsedOutput = {},
-            computedProperties = [];
+            computedProperties = [],
+            model = {};
 
         if (modelDescription.hasOwnProperty('namespace')) {
             preparedOrigin = namespaceExtractor(origin, modelDescription.namespace);
+            keys.splice(keys.indexOf('namespace'), 1);
         } else {
             preparedOrigin = origin;
         }
 
+        if (modelDescription.hasOwnProperty('serializable')) {
+            keys.splice(keys.indexOf('serializable'), 1);
+        }
+
         keys.forEach(function (key) {
             var value = modelDescription[key],
-                includeProperty = true,
                 parsedValue;
 
             if (typeof value === 'function') {
-                // keep computed properties to evaluate them after the ordinary properties has been evaluated.
-                // the evaluated properties will be accessible within the property function
+                // keep computed properties to evaluate them after the ordinary properties have been evaluated.
+                // the evaluated properties will be accessible within the property function.
                 computedProperties.push(key);
-
             } else {
-                includeProperty = key.indexOf('serializable') < 0 && key.indexOf('namespace') < 0;
-                if (includeProperty) {
-                    if (preparedOrigin.hasOwnProperty(value)) {
-                        parsedValue = preparedOrigin[value];
-                    } else {
-                        parsedValue = namespaceExtractor(preparedOrigin, value);
-                    }
+                if (preparedOrigin.hasOwnProperty(value)) {
+                    parsedValue = preparedOrigin[value];
+                } else {
+                    parsedValue = namespaceExtractor(preparedOrigin, value);
                 }
-                if (includeProperty) {
-                    parsedOutput[key] = parsedValue;
-                }
+                model[key] = parsedValue;
             }
         });
 
         computedProperties.forEach(function (key) {
             var fn = modelDescription[key];
-            parsedOutput[key] = fn.call(preparedOrigin, preparedOrigin, namespaceExtractor);
+            model[key] = fn.call(preparedOrigin, preparedOrigin, namespaceExtractor);
         });
 
-        return parsedOutput;
+        return model;
     },
 
     /**
