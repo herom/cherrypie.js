@@ -2,7 +2,8 @@
 JSON-Molder is just another model populating model-factory which converts your incoming JSON
 object into a simpler model object with the help of a so called model description. With JSON-Molder
 you're able to get the primitive "namespaced" object values as well as "computed" properties which
-depend on a number of values from the received JSON.
+depend on a number of values from the received JSON as well as reduce/desolate the "rich" model
+object back to the object which is expected at the backend.
 
 ##Examples
 
@@ -114,8 +115,6 @@ Populated Model:
   name: 'Bruce Wayne',
   nick: 'Batman'
 }
-
-
 
 If you want to contribute, feel free to raise an issue or open a pull request - I'm glad
 if my idea fits your needs ;)
