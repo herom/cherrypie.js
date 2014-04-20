@@ -79,6 +79,7 @@ Populated Model:
   nick: 'Batman',
   serializable: ['firstName', 'lastName', 'nick']
 }
+```
 
 ###Parse computed values from JSON with minimal model description
 
@@ -115,6 +116,7 @@ Populated Model:
   name: 'Bruce Wayne',
   nick: 'Batman'
 }
+```
 
 
 ###Reduce a "rich" model
