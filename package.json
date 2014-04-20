@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --recursive"
   },
-  "main": "./molder/model-factory",
+  "main": "./molder/molder",
   "version": "0.0.2",
   "dependencies": {},
   "devDependencies": {

@@ -1,7 +1,7 @@
 var should = require('should'),
-    ModelFactory = require('../molder/model-factory');
+    Molder = require('../molder/molder');
 
-describe("ModelFactory", function () {
+describe("Molder", function () {
     it("Should return the namespace-reduced origin", function () {
         var origin = {
                 session: {
@@ -15,7 +15,7 @@ describe("ModelFactory", function () {
             namespace = 'session.user.activities',
             result;
 
-        result = ModelFactory._extractNamespace(origin, namespace);
+        result = Molder._extractNamespace(origin, namespace);
 
         result.should.have.property('running', 'hooray');
     });
@@ -35,7 +35,7 @@ describe("ModelFactory", function () {
             },
             parsedResult;
 
-        parsedResult = ModelFactory.populate(modelDescription, response);
+        parsedResult = Molder.populate(modelDescription, response);
 
         parsedResult.should.have.property('status', 'clean');
     });
@@ -56,7 +56,7 @@ describe("ModelFactory", function () {
             },
             parsedResult;
 
-        parsedResult = ModelFactory.populate(modelDescription, response);
+        parsedResult = Molder.populate(modelDescription, response);
 
         parsedResult.should.have.property('status', 'clean');
     });
@@ -87,7 +87,7 @@ describe("ModelFactory", function () {
             },
             parsedResult;
 
-        parsedResult = ModelFactory.populate(description, origin);
+        parsedResult = Molder.populate(description, origin);
 
         parsedResult.should.have.property('favCar', 'Batmobil');
     });
@@ -124,7 +124,7 @@ describe("ModelFactory", function () {
             },
             parsedResult;
 
-        parsedResult = ModelFactory.populate(description, origin);
+        parsedResult = Molder.populate(description, origin);
 
         parsedResult.should.have.property('statusPhrase', 'Batman is happy');
     });
