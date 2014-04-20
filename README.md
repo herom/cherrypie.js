@@ -116,5 +116,31 @@ Populated Model:
   nick: 'Batman'
 }
 
+
+###Reduce a "rich" model
+
+Model Description:
+```
+{
+  firstName: 'firstName',
+  lastName: 'lastName',
+  name: function () {
+    return this.firstName + ' ' + this.lastName;
+  },
+  nick: 'nick',
+  serializable: ['firstName', 'lastName', 'nick']
+}
+```
+
+Reduced/desolated Model:
+```
+{
+  firstName: 'Bruce',
+  lastName: 'Wayne',
+  nick: 'Batman'
+}
+
+
+
 If you want to contribute, feel free to raise an issue or open a pull request - I'm glad
 if my idea fits your needs ;)

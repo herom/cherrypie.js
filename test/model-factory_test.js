@@ -128,4 +128,65 @@ describe("Molder", function () {
 
         parsedResult.should.have.property('statusPhrase', 'Batman is happy');
     });
+
+    it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
+       var model = {
+           name: 'Bruce Wayne',
+           firstName: 'Bruce',
+           lastName: 'Wayne'
+           },
+           modelDescription = {
+            namespace: 'session.user',
+               firstName: 'firstName',
+               lastName: 'lastName',
+               serializable: ['firstName', 'lastName']
+           },
+           reducedModel;
+
+        reducedModel = Molder.desolate(modelDescription, model);
+
+        reducedModel.should.not.have.property('name');
+    });
+
+    it("Should reduce/desolate the model even without a serializable Array in the model-description", function () {
+        var model = {
+                name: 'Bruce Wayne',
+                firstName: 'Bruce',
+                lastName: 'Wayne'
+            },
+            modelDescription = {
+                namespace: 'session.user',
+                firstName: 'firstName',
+                lastName: 'lastName'
+            },
+            reducedModel;
+
+        reducedModel = Molder.desolate(modelDescription, model);
+
+        reducedModel.should.not.have.property('namespace');
+    });
+
+    it("Should not reduce/desolate functions", function () {
+        var model = {
+                name: 'Bruce Wayne',
+                firstName: 'Bruce',
+                lastName: 'Wayne',
+                greet: function (user) {
+                    return 'Hello ' + user + '! This is ' + name + '.';
+                }
+            },
+            modelDescription = {
+                namespace: 'session.user',
+                firstName: 'firstName',
+                lastName: 'lastName',
+                greet: function (user) {
+                    return 'Hello ' + user + '! This is ' + name + '.';
+                }
+            },
+            reducedModel;
+
+        reducedModel = Molder.desolate(modelDescription, model);
+
+        reducedModel.should.not.have.property('greet');
+    });
 });

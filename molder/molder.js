@@ -85,6 +85,44 @@ var Molder = {
         }
 
         return namespacedOrigin;
+    },
+
+    /**
+     * Reduces the given model object to contain only the properties declared
+     * in the `modelDescription.serializable` Array so that it could be sent
+     * to the backend without all the "junk".
+     * <p>
+     *     If the model-description lacks of the `serializable` property, all
+     *     keys of the model-description will be serialized.
+     *
+     * @param {ModelDescription|Object}     modelDescription            The particular model description.
+     * @param {Object}                      model                       The model to be desolated/reduced.
+     * @returns {Object} The plain desolated/reduced model.
+     */
+    desolate: function (modelDescription, model) {
+        var serializableProperties = [],
+            desolatedModel = {};
+
+        if('serializable' in modelDescription) {
+            serializableProperties = modelDescription.serializable;
+        } else {
+            serializableProperties = Object.keys(modelDescription);
+        }
+
+        // ignore the namespace property as it's only useful on populating from the origin
+        if(serializableProperties.indexOf('namespace') > -1) {
+            serializableProperties.splice(serializableProperties.indexOf('namespace'), 1);
+        }
+
+        serializableProperties.forEach(function (key) {
+            var property = model[key];
+
+            if(typeof property !== 'function') {
+                desolatedModel[key] = property;
+            }
+        });
+
+        return desolatedModel;
     }
 };
 
