@@ -2,191 +2,191 @@ var should = require('should'),
     Molder = require('../molder/molder');
 
 describe("Molder", function () {
-    it("Should return the namespace-reduced origin", function () {
-        var origin = {
-                session: {
-                    user: {
-                        activities: {
-                            running: 'hooray'
-                        }
-                    }
-                }
+  it("Should return the namespace-reduced origin", function () {
+    var origin = {
+          session: {
+            user: {
+              activities: {
+                running: 'hooray'
+              }
+            }
+          }
+        },
+        namespace = 'session.user.activities',
+        result;
+
+    result = Molder._extractNamespace(origin, namespace);
+
+    result.should.have.property('running', 'hooray');
+  });
+
+  it("Should return 'primitive' properties from String values", function () {
+    var response = {
+          system: {
+            env: {
+              status: 'clean'
             },
-            namespace = 'session.user.activities',
-            result;
+            dummy: []
+          }
+        },
+        modelDescription = {
+          status: 'system.env.status',
+          serializable: ['status']
+        },
+        parsedResult;
 
-        result = Molder._extractNamespace(origin, namespace);
+    parsedResult = Molder.populate(modelDescription, response);
 
-        result.should.have.property('running', 'hooray');
-    });
+    parsedResult.should.have.property('status', 'clean');
+  });
 
-    it("Should return 'primitive' properties from String values", function () {
-        var response = {
-                system: {
-                    env: {
-                        status: 'clean'
-                    },
-                    dummy: []
-                }
+  it("Should return the right properties using the namespace", function () {
+    var response = {
+          system: {
+            env: {
+              status: 'clean'
             },
-            modelDescription = {
-                status: 'system.env.status',
-                serializable: ['status']
-            },
-            parsedResult;
+            dummy: []
+          }
+        },
+        modelDescription = {
+          namespace: 'system.env',
+          status: 'status',
+          serializable: ['status']
+        },
+        parsedResult;
 
-        parsedResult = Molder.populate(modelDescription, response);
+    parsedResult = Molder.populate(modelDescription, response);
 
-        parsedResult.should.have.property('status', 'clean');
-    });
+    parsedResult.should.have.property('status', 'clean');
+  });
 
-    it("Should return the right properties using the namespace", function () {
-        var response = {
-                system: {
-                    env: {
-                        status: 'clean'
-                    },
-                    dummy: []
-                }
-            },
-            modelDescription = {
-                namespace: 'system.env',
-                status: 'status',
-                serializable: ['status']
-            },
-            parsedResult;
+  it("Should return the right properties using a namespace and hierarchical key", function () {
+    var origin = {
+          session: {
+            user: {
+              name: 'Bruce Wayne',
+              nickname: 'Batman',
+              pet: 'Bat-Cat',
+              favourites: {
+                food: 'T-Bone Steak',
+                car: 'Batmobil'
+              },
+              mood: {
+                currentStatus: 'angry'
+              }
+            }
+          }
+        },
 
-        parsedResult = Molder.populate(modelDescription, response);
+        description = {
+          namespace: 'session.user',
+          name: 'name',
+          favCar: 'favourites.car',
+          serializable: ['name', 'favCar']
+        },
+        parsedResult;
 
-        parsedResult.should.have.property('status', 'clean');
-    });
+    parsedResult = Molder.populate(description, origin);
 
-    it("Should return the right properties using a namespace and hierarchical key", function () {
-        var origin = {
-                session: {
-                    user: {
-                        name: 'Bruce Wayne',
-                        nickname: 'Batman',
-                        pet: 'Bat-Cat',
-                        favourites: {
-                            food: 'T-Bone Steak',
-                            car: 'Batmobil'
-                        },
-                        mood: {
-                            currentStatus: 'angry'
-                        }
-                    }
-                }
-            },
-
-            description = {
-                namespace: 'session.user',
-                name: 'name',
-                favCar: 'favourites.car',
-                serializable: ['name', 'favCar']
-            },
-            parsedResult;
-
-        parsedResult = Molder.populate(description, origin);
-
-        parsedResult.should.have.property('favCar', 'Batmobil');
-    });
+    parsedResult.should.have.property('favCar', 'Batmobil');
+  });
 
 
-    it("Should return the computed properties", function () {
-        var origin = {
-                session: {
-                    user: {
-                        name: 'Bruce Wayne',
-                        nickname: 'Batman',
-                        pet: 'Bat-Cat',
-                        favourites: {
-                            food: 'T-Bone Steak',
-                            car: 'Batmobil'
-                        },
-                        mood: {
-                            currentStatus: 'happy'
-                        }
-                    }
-                }
-            },
+  it("Should return the computed properties", function () {
+    var origin = {
+          session: {
+            user: {
+              name: 'Bruce Wayne',
+              nickname: 'Batman',
+              pet: 'Bat-Cat',
+              favourites: {
+                food: 'T-Bone Steak',
+                car: 'Batmobil'
+              },
+              mood: {
+                currentStatus: 'happy'
+              }
+            }
+          }
+        },
 
-            description = {
-                namespace: 'session.user',
-                nickname: 'nickname',
-                statusPhrase: function (origin, namespaceExtractor) {
-                    var status = namespaceExtractor(origin, 'mood.currentStatus'),
-                        person = this.nickname;
+        description = {
+          namespace: 'session.user',
+          nickname: 'nickname',
+          statusPhrase: function (origin, namespaceExtractor) {
+            var status = namespaceExtractor(origin, 'mood.currentStatus'),
+                person = this.nickname;
 
-                    return person + ' is ' + status;
-                },
-                serializable: ['nickname']
-            },
-            parsedResult;
+            return person + ' is ' + status;
+          },
+          serializable: ['nickname']
+        },
+        parsedResult;
 
-        parsedResult = Molder.populate(description, origin);
+    parsedResult = Molder.populate(description, origin);
 
-        parsedResult.should.have.property('statusPhrase', 'Batman is happy');
-    });
+    parsedResult.should.have.property('statusPhrase', 'Batman is happy');
+  });
 
-    it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
-       var model = {
-           name: 'Bruce Wayne',
-           firstName: 'Bruce',
-           lastName: 'Wayne'
-           },
-           modelDescription = {
-            namespace: 'session.user',
-               firstName: 'firstName',
-               lastName: 'lastName',
-               serializable: ['firstName', 'lastName']
-           },
-           reducedModel;
+  it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
+    var model = {
+          name: 'Bruce Wayne',
+          firstName: 'Bruce',
+          lastName: 'Wayne'
+        },
+        modelDescription = {
+          namespace: 'session.user',
+          firstName: 'firstName',
+          lastName: 'lastName',
+          serializable: ['firstName', 'lastName']
+        },
+        reducedModel;
 
-        reducedModel = Molder.desolate(modelDescription, model);
+    reducedModel = Molder.desolate(modelDescription, model);
 
-        reducedModel.should.not.have.property('name');
-    });
+    reducedModel.should.not.have.property('name');
+  });
 
-    it("Should reduce/desolate the model even without a serializable Array in the model-description", function () {
-        var model = {
-                name: 'Bruce Wayne',
-                firstName: 'Bruce',
-                lastName: 'Wayne'
-            },
-            modelDescription = {
-                namespace: 'session.user',
-                firstName: 'firstName',
-                lastName: 'lastName'
-            },
-            reducedModel;
+  it("Should reduce/desolate the model even without a serializable Array in the model-description", function () {
+    var model = {
+          name: 'Bruce Wayne',
+          firstName: 'Bruce',
+          lastName: 'Wayne'
+        },
+        modelDescription = {
+          namespace: 'session.user',
+          firstName: 'firstName',
+          lastName: 'lastName'
+        },
+        reducedModel;
 
-        reducedModel = Molder.desolate(modelDescription, model);
+    reducedModel = Molder.desolate(modelDescription, model);
 
-        reducedModel.should.not.have.property('namespace');
-    });
+    reducedModel.should.not.have.property('namespace');
+  });
 
-    it("Should not reduce/desolate functions", function () {
-        var model = {
-                name: 'Bruce Wayne',
-                firstName: 'Bruce',
-                lastName: 'Wayne',
-                greet: function (user) {
-                    return 'Hello ' + user + '! This is ' + name + '.';
-                }
-            },
-            modelDescription = {
-                namespace: 'session.user',
-                firstName: 'firstName',
-                lastName: 'lastName',
-                greet: function (user) {
-                    return 'Hello ' + user + '! This is ' + name + '.';
-                }
-            },
-            reducedModel;
+  it("Should not reduce/desolate functions", function () {
+    var model = {
+          name: 'Bruce Wayne',
+          firstName: 'Bruce',
+          lastName: 'Wayne',
+          greet: function (user) {
+            return 'Hello ' + user + '! This is ' + name + '.';
+          }
+        },
+        modelDescription = {
+          namespace: 'session.user',
+          firstName: 'firstName',
+          lastName: 'lastName',
+          greet: function (user) {
+            return 'Hello ' + user + '! This is ' + name + '.';
+          }
+        },
+        reducedModel;
 
-        reducedModel = Molder.desolate(modelDescription, model);
+    reducedModel = Molder.desolate(modelDescription, model);
 
-        reducedModel.should.not.have.property('greet');
-    });
+    reducedModel.should.not.have.property('greet');
+  });
 });

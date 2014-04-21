@@ -46,76 +46,76 @@
  * @static
  */
 var ModelDescription = {
-    /**
-     * The namespace of the origin (JSON) object.
-     *
-     * @property namespace
-     * @type {String}
-     */
-    namespace: 'session.user',
+  /**
+   * The namespace of the origin (JSON) object.
+   *
+   * @property namespace
+   * @type {String}
+   */
+  namespace: 'session.user',
 
-    /**
-     * An *example* property which should be populated into the model
-     * from the origin (JSON) object's own "primitive" data type values.
-     */
-    name: 'name',
+  /**
+   * An *example* property which should be populated into the model
+   * from the origin (JSON) object's own "primitive" data type values.
+   */
+  name: 'name',
 
-    /**
-     * An *example* computed property which should be populated from
-     * any of the origin (JSON) object's "primitive' data type values.
-     * <p>
-     *   The properties `origin` and `namespaceExtractor` are injected
-     *   by the `Molder`.
-     *
-     * For example:
-     * ```
-     * // this function
-     * statusPhrase: function (origin, namespaceExtractor) {
+  /**
+   * An *example* computed property which should be populated from
+   * any of the origin (JSON) object's "primitive' data type values.
+   * <p>
+   *   The properties `origin` and `namespaceExtractor` are injected
+   *   by the `Molder`.
+   *
+   * For example:
+   * ```
+   * // this function
+   * statusPhrase: function (origin, namespaceExtractor) {
      *   var status = namespaceExtractor(origin, 'system.user.status'),
      *       person = this.name;
      *
      *   return person + ' is ' + status;
      * }
-     *
-     * // would lead to this "model output":
-     * {
+   *
+   * // would lead to this "model output":
+   * {
      *  statusPhrase: "Batman is angry"
      * }
-     * ```
-     *
-     * @param {JSON|Object}             origin              This JSON origin.
-     * @param {Function}                namespaceExtractor  The namespace extractor function of the Molder.
-     * @returns {String}
-     */
-    statusPhrase: function (origin, namespaceExtractor) {
-        var status = namespaceExtractor(origin, 'mood.currentStatus'),
-            person = this.name;
+   * ```
+   *
+   * @param {JSON|Object}             origin              This JSON origin.
+   * @param {Function}                namespaceExtractor  The namespace extractor function of the Molder.
+   * @returns {String}
+   */
+  statusPhrase: function (origin, namespaceExtractor) {
+    var status = namespaceExtractor(origin, 'mood.currentStatus'),
+        person = this.name;
 
-        return person + ' is ' + status;
-    },
+    return person + ' is ' + status;
+  },
 
-    /**
-     * The array of properties which should be serialized when sending
-     * this model object via Ajax to the backend.
-     *
-     * For example:
-     * ```
-     * // this serializable properties
-     * {
+  /**
+   * The array of properties which should be serialized when sending
+   * this model object via Ajax to the backend.
+   *
+   * For example:
+   * ```
+   * // this serializable properties
+   * {
      *   serializable: ['name', 'nickname']
      * }
-     *
-     * // will create the following serialized model object:
-     * {
+   *
+   * // will create the following serialized model object:
+   * {
      *   name: "Bruce Wayne",
      *   nickname: "Batman"
      * }
-     * ```
-     * 
-     * @property serializable
-     * @type {Array}
-     */
-    serializable: ['name', 'nickname']
+   * ```
+   *
+   * @property serializable
+   * @type {Array}
+   */
+  serializable: ['name', 'nickname']
 };
 
 module.exports = ModelDescription;
