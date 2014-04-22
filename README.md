@@ -141,7 +141,7 @@ Reduced/desolated Model:
   lastName: 'Wayne',
   nick: 'Batman'
 }
-
+```
 
 
 If you want to contribute, feel free to raise an issue or open a pull request - I'm glad
