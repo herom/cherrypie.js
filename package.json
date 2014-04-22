@@ -1,6 +1,6 @@
 {
-  "name": "JSON-Molder",
-  "description": "Populate Model Object from incoming JSON",
+  "name": "json-molder",
+  "description": "Populate/desolate Model Object from/to JSON",
   "version": "0.0.2",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "scripts": {
