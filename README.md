@@ -1,11 +1,12 @@
-#JSON-Molder
-JSON-Molder is just another model populating model-factory which converts your incoming JSON
-object into a simpler model object with the help of a so called model description. With JSON-Molder
-you're able to get the primitive "namespaced" object values as well as "computed" properties which
-depend on a number of values from the received JSON as well as reduce/desolate the "rich" model
+#json-molder
+**json-molder** is just another model populating model-factory which helps you to convert your incoming JSON
+object into a simpler model object and vice versa with the help of a so called *model-description*. 
+
+With **json-molder** you're able to get the primitive "namespaced" object values as well as "computed" properties which
+depend on a number of values from the received JSON, as well as reduce/desolate the "rich" model
 object back to the object which is expected at the backend.
 
-##Examples
+##JSON-to-Rich-Model Examples
 
 ###Parse values from JSON
 
@@ -118,7 +119,7 @@ Populated Model:
 }
 ```
 
-
+##Rich-Model-to-JSON Examples
 ###Reduce a "rich" model
 
 Model Description:
@@ -143,6 +144,6 @@ Reduced/desolated Model:
 }
 ```
 
-
+##Contribute
 If you want to contribute, feel free to raise an issue or open a pull request - I'm glad
 if my idea fits your needs ;)
