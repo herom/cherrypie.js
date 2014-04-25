@@ -172,7 +172,7 @@ describe("Molder", function () {
           firstName: 'Bruce',
           lastName: 'Wayne',
           greet: function (user) {
-            return 'Hello ' + user + '! This is ' + name + '.';
+            return 'Hello ' + user + '! This is ' + this.name + '.';
           }
         },
         modelDescription = {
@@ -180,7 +180,7 @@ describe("Molder", function () {
           firstName: 'firstName',
           lastName: 'lastName',
           greet: function (user) {
-            return 'Hello ' + user + '! This is ' + name + '.';
+            return 'Hello ' + user + '! This is ' + this.name + '.';
           }
         },
         reducedModel;
