@@ -10,7 +10,8 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "mocha-jshint": "0.0.7"
   },
   "license": "MIT",
   "repository": {
