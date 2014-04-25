@@ -54,11 +54,11 @@ describe("Molder", function () {
           status: 'status',
           serializable: ['status']
         },
-        parsedResult;
+        model;
 
-    parsedResult = Molder.populate(modelDescription, response);
+    model = Molder.populate(modelDescription, response);
 
-    parsedResult.should.have.property('status', 'clean');
+    model.should.have.property('status', 'clean');
   });
 
   it("Should return the right properties using a namespace and hierarchical key", function () {
@@ -85,11 +85,11 @@ describe("Molder", function () {
           favCar: 'favourites.car',
           serializable: ['name', 'favCar']
         },
-        parsedResult;
+        model;
 
-    parsedResult = Molder.populate(description, origin);
+    model = Molder.populate(description, origin);
 
-    parsedResult.should.have.property('favCar', 'Batmobil');
+    model.should.have.property('favCar', 'Batmobil');
   });
 
 
@@ -122,11 +122,11 @@ describe("Molder", function () {
           },
           serializable: ['nickname']
         },
-        parsedResult;
+        model;
 
-    parsedResult = Molder.populate(description, origin);
+    model = Molder.populate(description, origin);
 
-    parsedResult.should.have.property('statusPhrase', 'Batman is happy');
+    model.should.have.property('statusPhrase', 'Batman is happy');
   });
 
   it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
