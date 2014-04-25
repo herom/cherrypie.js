@@ -189,4 +189,47 @@ describe("Molder", function () {
 
     reducedModel.should.not.have.property('greet');
   });
+
+  it("Should proceed even if the given 'namespace' is not present in the returned JSON", function () {
+    var origin = {
+              name: 'Bruce Wayne',
+              nickname: 'Batman'
+        },
+
+        description = {
+          namespace: 'session.user',
+          name: 'name',
+          nickname: 'nickname'
+        },
+        model;
+
+    model = Molder.populate(description, origin);
+
+    model.should.have.property('name');
+  });
+
+  it("Should proceed even if the model-description has the wrong namespace configured", function () {
+
+      var origin = {
+            session: {
+              user: {
+                name: 'Bruce Wayne',
+                nickname: 'Batman'
+              }
+            }
+          },
+
+          description = {
+            namespace: 'session.customer',
+            name: 'name',
+            favCar: 'favourites.car',
+            serializable: ['name', 'favCar']
+          },
+          model;
+
+      model = Molder.populate(description, origin);
+
+      model.should.have.property('name', undefined);
+      model.should.have.property('favCar', {});
+  });
 });

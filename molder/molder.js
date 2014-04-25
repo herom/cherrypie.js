@@ -1,8 +1,8 @@
 /**
- * Use the Molder to populate models from an (JSON) origin in an intuitive way.
+ * Use the Molder to populate models from an (JSON) origin and desolate rich models in an intuitive way.
  *
  * @class Molder
- * @module JSON-Molder
+ * @module json-molder
  * @static
  */
 var Molder = {
@@ -76,7 +76,9 @@ var Molder = {
           nestedOrigin = Object.create(origin);
 
       splittedNamespace.forEach(function getNamespaceExtractedOrigin(namespaceKey) {
-        nestedOrigin = nestedOrigin[namespaceKey];
+        if(nestedOrigin && namespaceKey in nestedOrigin) {
+          nestedOrigin = nestedOrigin[namespaceKey];
+        }
       });
 
       namespacedOrigin = nestedOrigin;
