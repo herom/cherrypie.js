@@ -51,7 +51,17 @@ Received JSON:
     "user": {
       "firstName": "Bruce",
       "lastName": "Wayne",
-      "nick": "Batman"
+      "nick": "Batman",
+      "comments": [
+        {
+          commentId: 'c01',
+          commentText: 'some text'
+        },
+        {
+          commentId: 'c02',
+          commentText: 'another text'
+        }
+      ]
     }
   }
 }
@@ -66,6 +76,22 @@ Model Description:
   name: function () {
     return this.firstName + ' ' + this.lastName;
   },
+  comments: function (preparedOrigin, namespaceExtractor, populate) {
+    var comments = preparedOrigin.comment,
+        commentDescription = {
+          id: 'commentId',
+          text: 'commentText'
+        },
+        preparedComments = [];
+
+        if(comments && comment.length > 0) {
+          comments.forEach(function (comment) {
+            preparedComments.push(populate(commentDescription, comment);
+          });
+        }
+
+        return preparedComments;
+  }
   nick: 'nick',
   serializable: ['firstName', 'lastName', 'nick']
 }
@@ -78,6 +104,16 @@ Populated Model:
   lastName: 'Wayne',
   name: 'Bruce Wayne',
   nick: 'Batman',
+  comments: [
+    {
+      id: 'c01',
+      text: 'some text'
+    },
+    {
+      id: 'c02',
+      text: 'another text'
+    }
+  ]
   serializable: ['firstName', 'lastName', 'nick']
 }
 ```

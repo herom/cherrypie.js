@@ -18,6 +18,7 @@ var Molder = {
   populate: function (modelDescription, origin) {
     var keys = Object.keys(modelDescription),
         namespaceExtractor = this._extractNamespace,
+        populator = this.populate,
         preparedOrigin = {},
         computedProperties = [],
         model = {};
@@ -53,7 +54,7 @@ var Molder = {
 
     computedProperties.forEach(function (key) {
       var fn = modelDescription[key];
-      model[key] = fn.call(preparedOrigin, preparedOrigin, namespaceExtractor);
+      model[key] = fn.call(preparedOrigin, preparedOrigin, namespaceExtractor, populator);
     });
 
     return model;

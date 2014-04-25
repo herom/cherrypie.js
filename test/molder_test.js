@@ -192,8 +192,8 @@ describe("Molder", function () {
 
   it("Should proceed even if the given 'namespace' is not present in the returned JSON", function () {
     var origin = {
-              name: 'Bruce Wayne',
-              nickname: 'Batman'
+          name: 'Bruce Wayne',
+          nickname: 'Batman'
         },
 
         description = {
@@ -210,26 +210,82 @@ describe("Molder", function () {
 
   it("Should proceed even if the model-description has the wrong namespace configured", function () {
 
-      var origin = {
-            session: {
-              user: {
-                name: 'Bruce Wayne',
-                nickname: 'Batman'
-              }
+    var origin = {
+          session: {
+            user: {
+              name: 'Bruce Wayne',
+              nickname: 'Batman'
             }
-          },
+          }
+        },
 
-          description = {
-            namespace: 'session.customer',
-            name: 'name',
-            favCar: 'favourites.car',
-            serializable: ['name', 'favCar']
-          },
-          model;
+        description = {
+          namespace: 'session.customer',
+          name: 'name',
+          favCar: 'favourites.car',
+          serializable: ['name', 'favCar']
+        },
+        model;
 
-      model = Molder.populate(description, origin);
+    model = Molder.populate(description, origin);
 
-      model.should.have.property('name', undefined);
-      model.should.have.property('favCar', {});
+    model.should.have.property('name', undefined);
+    model.should.have.property('favCar', {});
+  });
+
+  it("Should populate model-descriptions in computed properties", function () {
+    var origin = {
+          session: {
+            user: {
+              comments: [
+                {
+                  commentId: 'a01',
+                  commentText: 'some comment'
+                },
+                {
+                  commentId: 'b02',
+                  commentText: 'another comment'
+                }
+              ]
+            }
+          }
+        },
+        description = {
+          namespace: 'session.user',
+
+          comments: function (preparedOrigin, namespaceExtractor, populate) {
+            var comments = preparedOrigin.comments,
+                commentDescripton = {
+                  id: 'commentId',
+                  text: 'commentText'
+                },
+                preparedComments = [];
+
+            comments.forEach(function (comment) {
+              preparedComments.push(populate(commentDescripton, comment));
+            });
+
+            return preparedComments;
+          }
+        },
+
+        expectedModel = {
+          comments: [
+            {
+              id: 'a01',
+              text: 'some comment'
+            },
+            {
+              id: 'b02',
+              text: 'another comment'
+            }
+          ]
+        },
+
+        model;
+
+    model = Molder.populate(description, origin);
+
+    should(model).eql(expectedModel);
   });
 });
