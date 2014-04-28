@@ -155,6 +155,74 @@ Populated Model:
 }
 ```
 
+###Parse properties using child model-descriptions from JSON
+
+Received JSON:
+```
+{
+  "session": {
+    "user": {
+      "firstName": "Bruce",
+      "lastName": "Wayne",
+      "nick": "Batman",
+      "comments": [
+        {
+          commentId: 'c01',
+          commentText: 'some text'
+        },
+        {
+          commentId: 'c02',
+          commentText: 'another text'
+        }
+      ]
+    }
+  }
+}
+```
+
+Model Description:
+```
+{
+  namespace: 'session.user',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  name: function () {
+    return this.firstName + ' ' + this.lastName;
+  },
+  comments: 'comments',
+  __children: {
+    comments: {
+      id: 'commentId',
+      text: 'commentText'
+    }
+  },
+  nick: 'nick',
+  serializable: ['firstName', 'lastName', 'nick']
+}
+```
+
+Populated Model:
+```
+{
+  firstName: 'Bruce',
+  lastName: 'Wayne',
+  name: 'Bruce Wayne',
+  nick: 'Batman',
+  comments: [
+    {
+      id: 'c01',
+      text: 'some text'
+    },
+    {
+      id: 'c02',
+      text: 'another text'
+    }
+  ]
+  serializable: ['firstName', 'lastName', 'nick']
+}
+```
+
+
 ##Rich-Model-to-JSON Examples
 ###Reduce a "rich" model
 
