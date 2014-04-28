@@ -1,7 +1,7 @@
 {
   "name": "json-molder",
   "description": "Populate/desolate Model Object from/to JSON",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "contributors": [
     {
@@ -27,5 +27,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/herom/json-molder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/herom/json-molder/issues"
   }
 }
