@@ -52,7 +52,7 @@ var ModelDescription = {
    * @property namespace
    * @type {String}
    */
-  namespace: 'session.user',
+  __namespace: 'session.user',
 
   /**
    * An *example* property which should be populated into the model
@@ -94,6 +94,37 @@ var ModelDescription = {
     return person + ' is ' + status;
   },
 
+
+  /**
+   * An *example* property which has it's own child model-description defined
+   * in the `__children` property. Properties with a child model-description
+   * have to be arrays.
+   */
+  hobbies: 'hobbies',
+
+  /**
+   * An *example* child model-description. These descriptions are applied to every
+   * entry of the array of the corresponding property.
+   *
+   * For example:
+   * ```
+   * __children: {
+   *   hobbies: {
+   *       id: 'id',
+   *       description: 'activity'
+   *     }
+   *   }
+   *
+   * @property __children
+   * @type {Object}
+   */
+  __children: {
+    hobbies: {
+      id: 'id',
+      description: 'description'
+    }
+  },
+
   /**
    * The array of properties which should be serialized when sending
    * this model object via Ajax to the backend.
@@ -115,7 +146,7 @@ var ModelDescription = {
    * @property serializable
    * @type {Array}
    */
-  serializable: ['name', 'nickname']
+  __serializable: ['name', 'nickname']
 };
 
 module.exports = ModelDescription;

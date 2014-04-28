@@ -31,7 +31,7 @@ describe("Molder", function () {
         },
         modelDescription = {
           status: 'system.env.status',
-          serializable: ['status']
+          __serializables: ['status']
         },
         parsedResult;
 
@@ -50,9 +50,9 @@ describe("Molder", function () {
           }
         },
         modelDescription = {
-          namespace: 'system.env',
+          __namespace: 'system.env',
           status: 'status',
-          serializable: ['status']
+          __serializable: ['status']
         },
         model;
 
@@ -80,10 +80,10 @@ describe("Molder", function () {
         },
 
         description = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           name: 'name',
           favCar: 'favourites.car',
-          serializable: ['name', 'favCar']
+          __serializable: ['name', 'favCar']
         },
         model;
 
@@ -112,7 +112,7 @@ describe("Molder", function () {
         },
 
         description = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           nickname: 'nickname',
           statusPhrase: function (origin, namespaceExtractor) {
             var status = namespaceExtractor(origin, 'mood.currentStatus'),
@@ -120,7 +120,7 @@ describe("Molder", function () {
 
             return person + ' is ' + status;
           },
-          serializable: ['nickname']
+          __serializable: ['nickname']
         },
         model;
 
@@ -136,10 +136,10 @@ describe("Molder", function () {
           lastName: 'Wayne'
         },
         modelDescription = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           firstName: 'firstName',
           lastName: 'lastName',
-          serializable: ['firstName', 'lastName']
+          __serializable: ['firstName', 'lastName']
         },
         reducedModel;
 
@@ -155,7 +155,7 @@ describe("Molder", function () {
           lastName: 'Wayne'
         },
         modelDescription = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           firstName: 'firstName',
           lastName: 'lastName'
         },
@@ -176,7 +176,7 @@ describe("Molder", function () {
           }
         },
         modelDescription = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           firstName: 'firstName',
           lastName: 'lastName',
           greet: function (user) {
@@ -197,7 +197,7 @@ describe("Molder", function () {
         },
 
         description = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
           name: 'name',
           nickname: 'nickname'
         },
@@ -220,10 +220,10 @@ describe("Molder", function () {
         },
 
         description = {
-          namespace: 'session.customer',
+          __namespace: 'session.customer',
           name: 'name',
           favCar: 'favourites.car',
-          serializable: ['name', 'favCar']
+          __serializable: ['name', 'favCar']
         },
         model;
 
@@ -250,7 +250,7 @@ describe("Molder", function () {
           }
         },
         description = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
 
           comments: function (preparedOrigin, namespaceExtractor, populate) {
             var comments = preparedOrigin.comments,
@@ -260,7 +260,7 @@ describe("Molder", function () {
                 },
                 preparedComments = null;
 
-            if(comments) {
+            if (comments) {
               preparedComments = [];
               comments.forEach(function (comment) {
                 preparedComments.push(populate(commentDescripton, comment));
@@ -302,7 +302,7 @@ describe("Molder", function () {
           }
         },
         description = {
-          namespace: 'session.user',
+          __namespace: 'session.user',
 
           comments: function (preparedOrigin, namespaceExtractor, populate) {
             var comments = preparedOrigin.comments,
@@ -312,7 +312,7 @@ describe("Molder", function () {
                 },
                 preparedComments = null;
 
-            if(comments) {
+            if (comments) {
               preparedComments = [];
               comments.forEach(function (comment) {
                 preparedComments.push(populate(commentDescripton, comment));
@@ -336,16 +336,214 @@ describe("Molder", function () {
 
   it("Should not get the namespace if the model-description has a wrong namespace configured", function () {
     var origin = {
-          any: {
-            evil: {
-              person: 'Jason'
-            }
-          }
+      any: {
+        evil: {
+          person: 'Jason'
+        }
+      }
     }, res;
 
     res = Molder._extractNamespace(origin, 'session.user');
 
     should(res).eql(null);
+  });
+
+  it("Should return the right child properties using a child model-description", function () {
+    var origin = {
+          "session": {
+            "user": {
+              "name": "Bruce Wayne",
+              "nick": "Batman",
+              "hobbyList": [
+                {
+                  id: 1,
+                  activity: 'Hiking'
+                },
+                {
+                  id: 2,
+                  activity: 'Biking'
+                }
+              ]
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session.user',
+          name: 'name',
+          nick: 'nick',
+          hobbies: 'hobbyList',
+          __children: {
+            hobbies: {
+              id: 'id',
+              description: 'activity'
+            }
+          },
+          __serializable: ['name', 'nick']
+        },
+        expectedModel = {
+          name: "Bruce Wayne",
+          nick: "Batman",
+          hobbies: [
+            {id: 1, description: "Hiking"},
+            {id: 2, description: "Biking"}
+          ]
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
+
+  it("Should populate all child properties in child properties", function () {
+    var origin = {
+          "artist": {
+            "name": "Iron Maiden",
+            "albumList": [
+              {
+                "title": "Iron Maiden",
+                "year": 1980,
+                "tracks": [
+                  {
+                    "number": 1,
+                    "title": "Prowler"
+                  },
+                  {
+                    "number": 2,
+                    "title": "Remember Tomorrow"
+                  },
+                  {
+                    "number": 3,
+                    "title": "Running Free"
+                  }
+                ]
+              },
+              {
+                "title": "Killers",
+                "year": 1981,
+                "tracks": [
+                  {
+                    "number": 1,
+                    "title": "The Ides of March"
+                  },
+                  {
+                    "number": 2,
+                    "title": "Wrathchild"
+                  },
+                  {
+                    "number": 3,
+                    "title": "Murders in the Rue Morgue"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        modelDescription = {
+          __namespace: "artist",
+          name: "name",
+          albums: "albumList",
+          __children: {
+            albums: {
+              title: "title",
+              year: "year",
+              tracks: "tracks",
+              __children: {
+                tracks: {
+                  number: "number",
+                  title: "title"
+                }
+              }
+            }
+          },
+          __serializable: ['name', 'nick']
+        },
+        expectedModel = {
+          name: "Iron Maiden",
+          albums: [
+            {
+              title: "Iron Maiden",
+              year: 1980,
+              tracks: [
+                {number: 1, title: "Prowler"},
+                {number: 2, title: "Remember Tomorrow"},
+                {number: 3, title: "Running Free"}
+              ]
+            },
+            {
+              title: "Killers",
+              year: 1981,
+              tracks: [
+                {number: 1, title: "The Ides of March"},
+                {number: 2, title: "Wrathchild"},
+                {number: 3, title: "Murders in the Rue Morgue"}
+              ]
+            }
+
+          ]
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
+
+
+  it("Should child properties using a child model-description with a namespace", function () {
+    var origin = {
+          "session": {
+            "user": {
+              "name": "Bruce Wayne",
+              "nick": "Batman",
+              "hobbyList": [
+                {
+                  "outdoor": {
+                    "sports": {
+                      id: 1,
+                      activity: 'Hiking'
+                    }
+                  }
+                },
+                {
+                  "outdoor": {
+                    "sports": {
+                      id: 2,
+                      activity: 'Biking'
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session.user',
+          name: 'name',
+          nick: 'nick',
+          hobbies: 'hobbyList',
+          __children: {
+            hobbies: {
+              __namespace: "outdoor.sports",
+              id: 'id',
+              description: 'activity'
+            }
+          },
+          __serializable: ['name', 'nick']
+        },
+        expectedModel = {
+          name: "Bruce Wayne",
+          nick: "Batman",
+          hobbies: [
+            {id: 1, description: "Hiking"},
+            {id: 2, description: "Biking"}
+          ]
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
   });
 
 });

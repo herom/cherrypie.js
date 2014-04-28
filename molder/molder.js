@@ -17,21 +17,25 @@ var Molder = {
    */
   populate: function (modelDescription, origin) {
     var keys = Object.keys(modelDescription),
-        namespaceExtractor = this._extractNamespace,
-        populator = this.populate,
         preparedOrigin = {},
         computedProperties = [],
+        childDescriptions = {},
         model = {};
 
-    if (modelDescription.hasOwnProperty('namespace')) {
-      preparedOrigin = namespaceExtractor(origin, modelDescription.namespace);
-      keys.splice(keys.indexOf('namespace'), 1);
+    if (modelDescription.hasOwnProperty('__namespace')) {
+      preparedOrigin = this._extractNamespace(origin, modelDescription.__namespace);
+      keys.splice(keys.indexOf('__namespace'), 1);
     } else {
       preparedOrigin = origin;
     }
 
-    if (modelDescription.hasOwnProperty('serializable')) {
-      keys.splice(keys.indexOf('serializable'), 1);
+    if (modelDescription.hasOwnProperty('__serializable')) {
+      keys.splice(keys.indexOf('__serializable'), 1);
+    }
+
+    if (modelDescription.hasOwnProperty('__children')) {
+      childDescriptions = modelDescription.__children;
+      keys.splice(keys.indexOf('__children'), 1);
     }
 
     keys.forEach(function (key) {
@@ -43,25 +47,38 @@ var Molder = {
         // the evaluated properties will be accessible within the property function.
         computedProperties.push(key);
       } else if (preparedOrigin) {
-        if (preparedOrigin.hasOwnProperty(value)) {
+        var children;
+        if (childDescriptions.hasOwnProperty(key) && Array.isArray(children = preparedOrigin[value])) {
+          var childDescription = childDescriptions[key],
+              childModel;
+
+          parsedValue = [];
+          children.forEach(function (child) {
+            childModel = this.populate(childDescription, child);
+            if (childModel) {
+              parsedValue.push(childModel);
+            }
+          }.bind(this));
+
+        } else if (preparedOrigin.hasOwnProperty(value)) {
           parsedValue = preparedOrigin[value];
         } else {
-          parsedValue = namespaceExtractor(preparedOrigin, value);
+          parsedValue = this._extractNamespace(preparedOrigin, value);
         }
         model[key] = parsedValue;
       }
-    });
+    }.bind(this));
 
     computedProperties.forEach(function (key) {
       if (preparedOrigin) {
         var fn = modelDescription[key];
-        model[key] = fn.call(model, preparedOrigin, namespaceExtractor, populator);
+        model[key] = fn.call(model, preparedOrigin, this._extractNamespace, this.populate);
       } else {
         model[key] = null;
       }
-    });
+    }.bind(this));
 
-    if(Object.keys(model).length <= 0) {
+    if (Object.keys(model).length <= 0) {
       model = null;
     }
 
