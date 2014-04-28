@@ -12,7 +12,7 @@
       "name": "Martin Groller",
       "email": "madmg82@gmail.com"
     }
-    ],
+  ],
   "scripts": {
     "test": "node_modules/.bin/mocha -w"
   },
