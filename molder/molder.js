@@ -42,7 +42,7 @@ var Molder = {
         // keep computed properties to evaluate them after the ordinary properties have been evaluated.
         // the evaluated properties will be accessible within the property function.
         computedProperties.push(key);
-      } else {
+      } else if (preparedOrigin) {
         if (preparedOrigin.hasOwnProperty(value)) {
           parsedValue = preparedOrigin[value];
         } else {
@@ -53,9 +53,17 @@ var Molder = {
     });
 
     computedProperties.forEach(function (key) {
-      var fn = modelDescription[key];
-      model[key] = fn.call(preparedOrigin, preparedOrigin, namespaceExtractor, populator);
+      if (preparedOrigin) {
+        var fn = modelDescription[key];
+        model[key] = fn.call(model, preparedOrigin, namespaceExtractor, populator);
+      } else {
+        model[key] = null;
+      }
     });
+
+    if(Object.keys(model).length <= 0) {
+      model = null;
+    }
 
     return model;
   },
@@ -74,15 +82,25 @@ var Molder = {
 
     if (typeof namespace === 'string' && namespace.indexOf('.') > -1) {
       var splittedNamespace = namespace.split('.'),
-          nestedOrigin = Object.create(origin);
+          namespaceKey,
+          iterator = 0;
 
-      splittedNamespace.forEach(function getNamespaceExtractedOrigin(namespaceKey) {
-        if(nestedOrigin && namespaceKey in nestedOrigin) {
-          nestedOrigin = nestedOrigin[namespaceKey];
+      namespacedOrigin = origin;
+
+      for (; iterator < splittedNamespace.length; iterator++) {
+        namespaceKey = splittedNamespace[iterator];
+
+        if (namespacedOrigin && namespacedOrigin[namespaceKey]) {
+          namespacedOrigin = namespacedOrigin[namespaceKey];
+        } else {
+          break;
         }
-      });
+      }
 
-      namespacedOrigin = nestedOrigin;
+      if (iterator < splittedNamespace.length) {
+        namespacedOrigin = null;
+      }
+
     } else {
       namespacedOrigin = origin[namespace];
     }

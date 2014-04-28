@@ -190,7 +190,7 @@ describe("Molder", function () {
     reducedModel.should.not.have.property('greet');
   });
 
-  it("Should proceed even if the given 'namespace' is not present in the returned JSON", function () {
+  it("Should return null if the given 'namespace' is not present in the returned JSON", function () {
     var origin = {
           name: 'Bruce Wayne',
           nickname: 'Batman'
@@ -205,10 +205,10 @@ describe("Molder", function () {
 
     model = Molder.populate(description, origin);
 
-    model.should.have.property('name');
+    should(model).eql(null);
   });
 
-  it("Should proceed even if the model-description has the wrong namespace configured", function () {
+  it("Should return null if the model-description has the wrong namespace configured", function () {
 
     var origin = {
           session: {
@@ -229,8 +229,7 @@ describe("Molder", function () {
 
     model = Molder.populate(description, origin);
 
-    model.should.have.property('name', undefined);
-    model.should.have.property('favCar', {});
+    should(model).eql(null);
   });
 
   it("Should populate model-descriptions in computed properties", function () {
@@ -259,11 +258,15 @@ describe("Molder", function () {
                   id: 'commentId',
                   text: 'commentText'
                 },
-                preparedComments = [];
+                preparedComments = null;
 
-            comments.forEach(function (comment) {
-              preparedComments.push(populate(commentDescripton, comment));
-            });
+            if(comments) {
+              preparedComments = [];
+              comments.forEach(function (comment) {
+                preparedComments.push(populate(commentDescripton, comment));
+              });
+            }
+
 
             return preparedComments;
           }
@@ -288,4 +291,61 @@ describe("Molder", function () {
 
     should(model).eql(expectedModel);
   });
+
+
+  it("Should proceed even if the model-description with computed properties has the wrong namespace configured", function () {
+    var origin = {
+          any: {
+            evil: {
+              person: 'Jason'
+            }
+          }
+        },
+        description = {
+          namespace: 'session.user',
+
+          comments: function (preparedOrigin, namespaceExtractor, populate) {
+            var comments = preparedOrigin.comments,
+                commentDescripton = {
+                  id: 'commentId',
+                  text: 'commentText'
+                },
+                preparedComments = null;
+
+            if(comments) {
+              preparedComments = [];
+              comments.forEach(function (comment) {
+                preparedComments.push(populate(commentDescripton, comment));
+              });
+            }
+
+            return preparedComments;
+          }
+        },
+
+        expectedModel = {
+          comments: null
+        },
+
+        model;
+
+    model = Molder.populate(description, origin);
+
+    should(model).eql(expectedModel);
+  });
+
+  it("Should not get the namespace if the model-description has a wrong namespace configured", function () {
+    var origin = {
+          any: {
+            evil: {
+              person: 'Jason'
+            }
+          }
+    }, res;
+
+    res = Molder._extractNamespace(origin, 'session.user');
+
+    should(res).eql(null);
+  });
+
 });
