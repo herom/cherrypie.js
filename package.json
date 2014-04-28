@@ -3,6 +3,16 @@
   "description": "Populate/desolate Model Object from/to JSON",
   "version": "0.1.0",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
+  "contributors": [
+    {
+      "name": "Heinz Romirer",
+      "email": "h.romirer@gmail.com"
+    },
+    {
+      "name": "Martin Groller",
+      "email": "madmg82@gmail.com"
+    }
+    ],
   "scripts": {
     "test": "node_modules/.bin/mocha -w"
   },
