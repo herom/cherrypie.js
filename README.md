@@ -25,7 +25,7 @@ Received JSON:
 Model Description:
 ```
 {
-  namespace: 'session.user',
+  __namespace: 'session.user',
   name: 'name',
   nick: 'nick',
   serializable: ['name', 'nick']
@@ -70,7 +70,7 @@ Received JSON:
 Model Description:
 ```
 {
-  namespace: 'session.user',
+  __namespace: 'session.user',
   firstName: 'firstName',
   lastName: 'lastName',
   name: function () {
@@ -183,7 +183,7 @@ Received JSON:
 Model Description:
 ```
 {
-  namespace: 'session.user',
+  __namespace: 'session.user',
   firstName: 'firstName',
   lastName: 'lastName',
   name: function () {
@@ -197,7 +197,7 @@ Model Description:
     }
   },
   nick: 'nick',
-  serializable: ['firstName', 'lastName', 'nick']
+  __serializable: ['firstName', 'lastName', 'nick']
 }
 ```
 
@@ -218,7 +218,7 @@ Populated Model:
       text: 'another text'
     }
   ]
-  serializable: ['firstName', 'lastName', 'nick']
+  __serializable: ['firstName', 'lastName', 'nick']
 }
 ```
 
@@ -235,7 +235,7 @@ Model Description:
     return this.firstName + ' ' + this.lastName;
   },
   nick: 'nick',
-  serializable: ['firstName', 'lastName', 'nick']
+  __serializable: ['firstName', 'lastName', 'nick']
 }
 ```
 
