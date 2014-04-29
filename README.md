@@ -28,7 +28,7 @@ Model Description:
   __namespace: 'session.user',
   name: 'name',
   nick: 'nick',
-  serializable: ['name', 'nick']
+  __serializable: ['name', 'nick']
 }
 ```
 
@@ -37,7 +37,7 @@ Populated Model:
 {
   name: 'Bruce Wayne',
   nick: 'Batman',
-  serializable: ['name', 'nick']
+  __serializable: ['name', 'nick']
 }
 ```
 
@@ -93,7 +93,7 @@ Model Description:
         return preparedComments;
   }
   nick: 'nick',
-  serializable: ['firstName', 'lastName', 'nick']
+  __serializable: ['firstName', 'lastName', 'nick']
 }
 ```
 
@@ -114,7 +114,7 @@ Populated Model:
       text: 'another text'
     }
   ]
-  serializable: ['firstName', 'lastName', 'nick']
+  __serializable: ['firstName', 'lastName', 'nick']
 }
 ```
 
