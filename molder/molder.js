@@ -48,7 +48,7 @@ var Molder = {
         computedProperties.push(key);
       } else if (preparedOrigin) {
         var children;
-        if (childDescriptions.hasOwnProperty(key) && Array.isArray(children = preparedOrigin[value])) {
+        if (childDescriptions.hasOwnProperty(key) && (Array.isArray(children = preparedOrigin[value]) || Array.isArray(children = this._extractNamespace(preparedOrigin, value)))) {
           var childDescription = childDescriptions[key],
               childModel;
 
