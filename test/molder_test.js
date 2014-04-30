@@ -613,4 +613,41 @@ describe("Molder", function () {
 
     should(model).eql(expectedModel);
   });
+
+  it("Schould populate a child properties which are objects and not arrays", function () {
+    var origin = {
+          session: {
+            state: "Active",
+            detail: {
+              action: {
+                id: 1,
+                name: "login"
+              }
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session',
+          state: 'state',
+          action: 'detail.action',
+          __children: {
+            action: {
+              id: 'id',
+              action: 'name'
+            }
+          }
+        },
+        expectedModel = {
+          state: "Active",
+          action: {
+            id: 1,
+            action: "login"
+          }
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
 });

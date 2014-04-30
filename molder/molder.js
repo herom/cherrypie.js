@@ -47,24 +47,34 @@ var Molder = {
         // the evaluated properties will be accessible within the property function.
         computedProperties.push(key);
       } else if (preparedOrigin) {
-        var children;
-        if (childDescriptions.hasOwnProperty(key) && (Array.isArray(children = preparedOrigin[value]) || Array.isArray(children = this._extractNamespace(preparedOrigin, value)))) {
-          var childDescription = childDescriptions[key],
-              childModel;
-
-          parsedValue = [];
-          children.forEach(function (child) {
-            childModel = this.populate(childDescription, child);
-            if (childModel) {
-              parsedValue.push(childModel);
-            }
-          }.bind(this));
-
-        } else if (preparedOrigin.hasOwnProperty(value)) {
+        if (preparedOrigin.hasOwnProperty(value)) {
           parsedValue = preparedOrigin[value];
         } else {
           parsedValue = this._extractNamespace(preparedOrigin, value);
         }
+
+        if (childDescriptions.hasOwnProperty(key)) {
+          var children = parsedValue,
+              childDescription = childDescriptions[key],
+              childModel;
+
+          if (Array.isArray(children)) {
+            parsedValue = [];
+            children.forEach(function (child) {
+              childModel = this.populate(childDescription, child);
+              if (childModel) {
+                parsedValue.push(childModel);
+              }
+            }.bind(this));
+
+          } else if (typeof children === 'object') {
+            childModel = this.populate(childDescription, children);
+            if (childModel) {
+              parsedValue = childModel;
+            }
+          }
+        }
+
         model[key] = parsedValue;
       }
     }.bind(this));
