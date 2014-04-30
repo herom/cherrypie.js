@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/herom/json-molder.svg?branch=master)](https://travis-ci.org/herom/json-molder)
+
 #json-molder
 **json-molder** is just another model populating model-factory which helps you to convert your incoming JSON
 object into a simpler model object and vice versa with the help of a so called *model-description*. 
