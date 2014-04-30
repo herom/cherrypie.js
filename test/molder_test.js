@@ -546,4 +546,108 @@ describe("Molder", function () {
     should(model).eql(expectedModel);
   });
 
+  it("Should populate properties with a namespace and a global defined namespace ", function () {
+    var origin = {
+          session: {
+            state: "Active",
+            detail: {
+              actions: [
+                {id: 1, name: "login"},
+                {id: 2, name: "update"}
+              ]
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session',
+          state: 'state',
+          actions: 'detail.actions'
+        },
+        expectedModel = {
+          state: "Active",
+          actions: [
+            {id: 1, name: "login"},
+            {id: 2, name: "update"}
+          ]
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
+
+  it("Should populate child properties with a namespace and a a global defined namespace ", function () {
+    var origin = {
+          session: {
+            state: "Active",
+            detail: {
+              actions: [
+                {id: 1, name: "login"},
+                {id: 2, name: "update"}
+              ]
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session',
+          state: 'state',
+          actions: 'detail.actions',
+          __children: {
+            actions: {
+              id: 'id',
+              action: 'name'
+            }
+          }
+        },
+        expectedModel = {
+          state: "Active",
+          actions: [
+            {id: 1, action: "login"},
+            {id: 2, action: "update"}
+          ]
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
+
+  it("Schould populate a child properties which are objects and not arrays", function () {
+    var origin = {
+          session: {
+            state: "Active",
+            detail: {
+              action: {
+                id: 1,
+                name: "login"
+              }
+            }
+          }
+        },
+        modelDescription = {
+          __namespace: 'session',
+          state: 'state',
+          action: 'detail.action',
+          __children: {
+            action: {
+              id: 'id',
+              action: 'name'
+            }
+          }
+        },
+        expectedModel = {
+          state: "Active",
+          action: {
+            id: 1,
+            action: "login"
+          }
+        },
+        model;
+
+    model = Molder.populate(modelDescription, origin);
+
+    should(model).eql(expectedModel);
+  });
 });
