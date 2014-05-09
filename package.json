@@ -1,7 +1,7 @@
 {
   "name": "json-molder",
   "description": "Populate/desolate Model Object from/to JSON",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "contributors": [
     {
