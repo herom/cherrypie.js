@@ -148,29 +148,127 @@ var Molder = {
    * @returns {Object} The plain desolated/reduced model.
    */
   desolate: function (modelDescription, model) {
-    var serializableProperties = [],
-        desolatedModel = {};
+    var namespace = modelDescription.__namespace,
+        serializableProperties = [],
+        desolatedModel = null,
+        childModels = null;
 
-    if ('serializable' in modelDescription) {
-      serializableProperties = modelDescription.serializable;
+    if ('__serializable' in modelDescription) {
+      serializableProperties = modelDescription.__serializable;
     } else {
       serializableProperties = Object.keys(modelDescription);
+
+      var serializedClone = serializableProperties.slice();
+
+      serializedClone.every(function (clone, index) {
+        if (clone.match(/^__/)) {
+          serializableProperties.splice(index, 1);
+        }
+      });
     }
 
-    // ignore the namespace property as it's only useful on populating from the origin
-    if (serializableProperties.indexOf('namespace') > -1) {
-      serializableProperties.splice(serializableProperties.indexOf('namespace'), 1);
+    if ('__children' in modelDescription) {
+      var childKeys = Object.keys(modelDescription.__children);
+      childModels = {};
+
+      childKeys.forEach(function (childKey) {
+        if (serializableProperties.indexOf(childKey) > -1) {
+          serializableProperties.splice(serializableProperties.indexOf(childKey), 1);
+          childModels[childKey] = this.desolate(modelDescription.__children[childKey], model[childKey]);
+        }
+      }.bind(this));
     }
 
-    serializableProperties.forEach(function (key) {
-      var property = model[key];
+    desolatedModel = this._serialize(modelDescription, model, serializableProperties);
 
-      if (typeof property !== 'function') {
-        desolatedModel[key] = property;
+    if (desolatedModel && childModels) {
+      for (var childModel in childModels) {
+        if (childModels.hasOwnProperty(childModel)) {
+          desolatedModel[modelDescription[childModel]] = childModels[childModel];
+        }
       }
-    });
+    }
+
+    if (namespace) {
+      desolatedModel = this._generateNamespacedContainer(namespace, desolatedModel);
+    }
 
     return desolatedModel;
+  },
+
+  /**
+   * Serializes the model according to the modelDescription and the serializable properties given.
+   *
+   * @method _serialize
+   * @param {Object}          modelDescription          The description for this model.
+   * @param {Object|Array}    model                     The model.
+   * @param {Array}           serializableProperties    The array of serializable model properties.
+   * @returns {Object|Array}
+   * @private
+   */
+  _serialize: function (modelDescription, model, serializableProperties) {
+    var serialized;
+
+    if (Array.isArray(model) && model.length > 0) {
+      var serializedObject = {};
+      serialized = [];
+      model.forEach(function (obj) {
+        serializedObject = {};
+
+        for (var prop in obj) {
+          if (obj.hasOwnProperty(prop) && serializableProperties.indexOf(prop) > -1) {
+            serializedObject[modelDescription[prop]] = obj[prop];
+          }
+        }
+
+        serialized.push(serializedObject);
+      });
+    } else {
+      var propertyIndex = -1;
+      serialized = {};
+
+      for (var prop in model) {
+        propertyIndex = serializableProperties.indexOf(prop);
+
+        if (propertyIndex > -1 && model.hasOwnProperty(prop)) {
+          serialized[modelDescription[prop]] = model[prop];
+          serializableProperties.splice(propertyIndex, 1);
+        }
+      }
+    }
+
+    return serialized;
+  },
+
+  /**
+   * Returns a nested ("namespaced") Object/Container and places the optional given
+   * values object at the deepest object level.
+   *
+   * @method _generateNamespacedContainer
+   * @param {String}          namespace       The dot-separated (e.g.: "my.namespace") namespace string.
+   * @param {Object}          values          (optional) The values object at the end of the namespace.
+   * @returns {Object}
+   * @private
+   */
+  _generateNamespacedContainer: function (namespace, values) {
+    var namespacedContainer = {};
+
+    if (values && typeof values === 'object') {
+      namespacedContainer = values;
+    }
+
+    if (typeof namespace === 'string') {
+      var parts = namespace.split('.'),
+          tmpObj;
+
+      for (var i = parts.length - 1; i >= 0; i--) {
+        tmpObj = {};
+        tmpObj[parts[i]] = namespacedContainer;
+        namespacedContainer = tmpObj;
+      }
+
+      return namespacedContainer;
+    }
   }
 };
 
