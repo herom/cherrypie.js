@@ -335,7 +335,7 @@ describe("Molder", function () {
       should(model).eql(expectedModel);
     });
 
-    it("Should populate all child properties in child properties", function () {
+    it("Should crawl recursively through defined __children object(s)", function () {
       var origin = {
             "artist": {
               "name": "Iron Maiden",
@@ -430,7 +430,7 @@ describe("Molder", function () {
     });
 
 
-    it("Should child properties using a child model-description with a namespace", function () {
+    it("Should populate child properties using __namespace within its child model-description", function () {
       var origin = {
             "session": {
               "user": {
@@ -486,7 +486,7 @@ describe("Molder", function () {
       should(model).eql(expectedModel);
     });
 
-    it("Should populate properties with a namespace and a global defined namespace ", function () {
+    it("Should populate properties with a namespaced key and a global defined namespace ", function () {
       var origin = {
             session: {
               state: "Active",
