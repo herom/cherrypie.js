@@ -731,7 +731,7 @@ describe("Molder", function () {
       reducedModel.should.not.have.property('namespace');
     });
 
-    it("Should not reduce/desolate functions", function () {
+    it("Should throw an Error if a function should get serialized (no __serializable Array given)", function () {
       var model = {
             name: 'Bruce Wayne',
             firstName: 'Bruce',
@@ -747,12 +747,9 @@ describe("Molder", function () {
             greet: function (user) {
               return 'Hello ' + user + '! This is ' + this.name + '.';
             }
-          },
-          reducedModel;
+          };
 
-      reducedModel = Molder.desolate(modelDescription, model);
-
-      reducedModel.should.not.have.property('greet');
+      should(Molder.desolate.bind(this, modelDescription, model)).throw(Error);
     });
 
     it("Should desolate a simple model", function () {
@@ -905,6 +902,41 @@ describe("Molder", function () {
       result = Molder.desolate(modelDescription, model);
 
       should(result).eql(expected);
+    });
+
+    it("Should throw an Error if a 'computedProperty' is found in the __serializable Array", function () {
+      var modelDescription = {
+            __namespace: 'book',
+            id: 'bookId',
+            title: 'bookTitle',
+            subTitle: 'bookSubTitle',
+            authors: 'bookAuthors',
+            __children: {
+              authors: {
+                id: 'authorId',
+                name: 'authorName',
+                __serializable: ['id', 'name']
+              }
+            },
+            authorsCount: function () {
+              return this.authors.length;
+            },
+            __serializable: ['id', 'title', 'subTitle', 'authorsCount']
+          },
+          model = {
+            id: 'a0123',
+            title: 'Design Patterns',
+            subTitle: 'Elements of Reusable Object-Oriented Software',
+            authors: [
+              {id: 'asdf1234', name: 'Erich Gamma'},
+              {id: 'asdf1235', name: 'Richard Helm'},
+              {id: 'asdf1236', name: 'Ralph Johnson'},
+              {id: 'asdf1237', name: 'John Vlissides'}
+            ],
+            authorsCount: 4
+          };
+
+      should(Molder.desolate.bind(this, modelDescription, model)).throw(Error);
     });
   });
 });

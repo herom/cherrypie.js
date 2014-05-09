@@ -167,6 +167,17 @@ var Molder = {
       });
     }
 
+    // check if any computed properties are defined to be serialized
+    for(var i = 0; i < serializableProperties.length; i++) {
+      if(typeof modelDescription[serializableProperties[i]] === 'function') {
+        throw new Error(
+            'json-molder#desolate(): Unable to serialize a "computedProperty" found in the Array ' +
+                'of serializable properties (namespace: '+ namespace +')!'
+        );
+      }
+    }
+
+
     if ('__children' in modelDescription) {
       var childKeys = Object.keys(modelDescription.__children);
       childModels = {};
