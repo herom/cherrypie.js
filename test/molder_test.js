@@ -130,67 +130,6 @@ describe("Molder", function () {
       model.should.have.property('statusPhrase', 'Batman is happy');
     });
 
-    it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
-      var model = {
-            name: 'Bruce Wayne',
-            firstName: 'Bruce',
-            lastName: 'Wayne'
-          },
-          modelDescription = {
-            __namespace: 'session.user',
-            firstName: 'firstName',
-            lastName: 'lastName',
-            __serializable: ['firstName', 'lastName']
-          },
-          reducedModel;
-
-      reducedModel = Molder.desolate(modelDescription, model);
-
-      reducedModel.should.not.have.property('name');
-    });
-
-    it("Should reduce/desolate the model even without a serializable Array in the model-description", function () {
-      var model = {
-            name: 'Bruce Wayne',
-            firstName: 'Bruce',
-            lastName: 'Wayne'
-          },
-          modelDescription = {
-            __namespace: 'session.user',
-            firstName: 'firstName',
-            lastName: 'lastName'
-          },
-          reducedModel;
-
-      reducedModel = Molder.desolate(modelDescription, model);
-
-      reducedModel.should.not.have.property('namespace');
-    });
-
-    it("Should not reduce/desolate functions", function () {
-      var model = {
-            name: 'Bruce Wayne',
-            firstName: 'Bruce',
-            lastName: 'Wayne',
-            greet: function (user) {
-              return 'Hello ' + user + '! This is ' + this.name + '.';
-            }
-          },
-          modelDescription = {
-            __namespace: 'session.user',
-            firstName: 'firstName',
-            lastName: 'lastName',
-            greet: function (user) {
-              return 'Hello ' + user + '! This is ' + this.name + '.';
-            }
-          },
-          reducedModel;
-
-      reducedModel = Molder.desolate(modelDescription, model);
-
-      reducedModel.should.not.have.property('greet');
-    });
-
     it("Should return null if the given 'namespace' is not present in the returned JSON", function () {
       var origin = {
             name: 'Bruce Wayne',
@@ -615,7 +554,7 @@ describe("Molder", function () {
       should(model).eql(expectedModel);
     });
 
-    it("Schould populate a child properties which are objects and not arrays", function () {
+    it("Should populate a model with object child properties", function () {
       var origin = {
             session: {
               state: "Active",
@@ -755,6 +694,67 @@ describe("Molder", function () {
   });
 
   describe("#desolate()", function () {
+    it("Should reduce/desolate the model according to the serializable Array in the model-description", function () {
+      var model = {
+            name: 'Bruce Wayne',
+            firstName: 'Bruce',
+            lastName: 'Wayne'
+          },
+          modelDescription = {
+            __namespace: 'session.user',
+            firstName: 'firstName',
+            lastName: 'lastName',
+            __serializable: ['firstName', 'lastName']
+          },
+          reducedModel;
+
+      reducedModel = Molder.desolate(modelDescription, model);
+
+      reducedModel.should.not.have.property('name');
+    });
+
+    it("Should reduce/desolate the model even without a serializable Array in the model-description", function () {
+      var model = {
+            name: 'Bruce Wayne',
+            firstName: 'Bruce',
+            lastName: 'Wayne'
+          },
+          modelDescription = {
+            __namespace: 'session.user',
+            firstName: 'firstName',
+            lastName: 'lastName'
+          },
+          reducedModel;
+
+      reducedModel = Molder.desolate(modelDescription, model);
+
+      reducedModel.should.not.have.property('namespace');
+    });
+
+    it("Should not reduce/desolate functions", function () {
+      var model = {
+            name: 'Bruce Wayne',
+            firstName: 'Bruce',
+            lastName: 'Wayne',
+            greet: function (user) {
+              return 'Hello ' + user + '! This is ' + this.name + '.';
+            }
+          },
+          modelDescription = {
+            __namespace: 'session.user',
+            firstName: 'firstName',
+            lastName: 'lastName',
+            greet: function (user) {
+              return 'Hello ' + user + '! This is ' + this.name + '.';
+            }
+          },
+          reducedModel;
+
+      reducedModel = Molder.desolate(modelDescription, model);
+
+      reducedModel.should.not.have.property('greet');
+    });
+
     it("Should desolate a simple model", function () {
       var modelDescription = {
             __namespace: 'awesome',
