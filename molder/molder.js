@@ -23,7 +23,7 @@ var Molder = {
         model = {};
 
     if (modelDescription.hasOwnProperty('__namespace')) {
-      preparedOrigin = this._extractNamespace(origin, modelDescription.__namespace);
+      preparedOrigin = this.extractNamespace(origin, modelDescription.__namespace);
       keys.splice(keys.indexOf('__namespace'), 1);
     } else {
       preparedOrigin = origin;
@@ -38,6 +38,8 @@ var Molder = {
       keys.splice(keys.indexOf('__children'), 1);
     }
 
+    this._checkForChildren(keys,  Object.keys(childDescriptions));
+
     keys.forEach(function (key) {
       var value = modelDescription[key],
           parsedValue;
@@ -50,7 +52,7 @@ var Molder = {
         if (preparedOrigin.hasOwnProperty(value)) {
           parsedValue = preparedOrigin[value];
         } else {
-          parsedValue = this._extractNamespace(preparedOrigin, value);
+          parsedValue = this.extractNamespace(preparedOrigin, value);
         }
 
         if (childDescriptions.hasOwnProperty(key)) {
@@ -82,7 +84,7 @@ var Molder = {
     computedProperties.forEach(function (key) {
       if (preparedOrigin) {
         var fn = modelDescription[key];
-        model[key] = fn.call(model, preparedOrigin, this._extractNamespace, this.populate);
+        model[key] = fn.call(model, preparedOrigin, this);
       } else {
         model[key] = null;
       }
@@ -95,6 +97,16 @@ var Molder = {
     return model;
   },
 
+  _checkForChildren: function (modelDescriptionKeys, childKeys) {
+    return childKeys.every(function (key) {
+      if(modelDescriptionKeys.indexOf(key) > -1) {
+        return true;
+      } else {
+        throw new Error('Child ' + key + ' declared in __children but not in parent model description!');
+      }
+    });
+  },
+
   /**
    * Takes the given origin (JSON/Object) and namespace and returns
    * the namespaced/reduced object.
@@ -102,9 +114,8 @@ var Molder = {
    * @param {Object}          origin              The JSON origin.
    * @param {String}          namespace           The model-description namespace.
    * @returns {Object}
-   * @private
    */
-  _extractNamespace: function (origin, namespace) {
+  extractNamespace: function (origin, namespace) {
     var namespacedOrigin = null;
 
     if (typeof namespace === 'string' && namespace.indexOf('.') > -1) {

@@ -16,7 +16,7 @@ describe("Molder", function () {
           namespace = 'session.user.activities',
           result;
 
-      result = Molder._extractNamespace(origin, namespace);
+      result = Molder.extractNamespace(origin, namespace);
 
       result.should.have.property('running', 'hooray');
     });
@@ -115,8 +115,8 @@ describe("Molder", function () {
           description = {
             __namespace: 'session.user',
             nickname: 'nickname',
-            statusPhrase: function (origin, namespaceExtractor) {
-              var status = namespaceExtractor(origin, 'mood.currentStatus'),
+            statusPhrase: function (origin, molder) {
+              var status = molder.extractNamespace(origin, 'mood.currentStatus'),
                   person = this.nickname;
 
               return person + ' is ' + status;
@@ -192,7 +192,7 @@ describe("Molder", function () {
           description = {
             __namespace: 'session.user',
 
-            comments: function (preparedOrigin, namespaceExtractor, populate) {
+            comments: function (preparedOrigin, molder) {
               var comments = preparedOrigin.comments,
                   commentDescripton = {
                     id: 'commentId',
@@ -203,10 +203,9 @@ describe("Molder", function () {
               if (comments) {
                 preparedComments = [];
                 comments.forEach(function (comment) {
-                  preparedComments.push(populate(commentDescripton, comment));
+                  preparedComments.push(molder.populate(commentDescripton, comment));
                 });
               }
-
 
               return preparedComments;
             }
@@ -283,7 +282,7 @@ describe("Molder", function () {
         }
       }, res;
 
-      res = Molder._extractNamespace(origin, 'session.user');
+      res = Molder.extractNamespace(origin, 'session.user');
 
       should(res).eql(null);
     });
@@ -589,6 +588,33 @@ describe("Molder", function () {
       model = Molder.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
+    });
+
+    it("Should throw an error if a 'to be processed child' in __children is not declared in the parent", function () {
+      var origin = {
+            session: {
+              state: "Active",
+              detail: {
+                action: {
+                  id: 1,
+                  name: "login"
+                }
+              }
+            }
+          },
+          modelDescription = {
+            __namespace: 'session',
+            state: 'state',
+            action: 'detail.action',
+            __children: {
+              myAction: {
+                id: 'id',
+                action: 'name'
+              }
+            }
+          };
+
+      should(Molder.populate.bind(this, modelDescription, origin)).throw(Error);
     });
   });
 
