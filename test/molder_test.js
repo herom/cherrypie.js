@@ -1,7 +1,7 @@
 var should = require('should'),
-    Molder = require('../molder/molder');
+    Molder = require('../index');
 
-describe("Molder", function () {
+describe("JsonMolder", function () {
   describe("#populate()", function () {
     it("Should return the namespace-reduced origin", function () {
       var origin = {

@@ -1,11 +1,11 @@
 /**
  * Use the Molder to populate models from an (JSON) origin and desolate rich models in an intuitive way.
  *
- * @class Molder
+ * @class JsonMolder
  * @module json-molder
  * @static
  */
-var Molder = {
+var JsonMolder = {
   /**
    * Takes the given model description along with the origin (JSON) object
    * and returns the populated model.
@@ -97,6 +97,17 @@ var Molder = {
     return model;
   },
 
+  /**
+   * Checks if all `childKeys` are present in the parent model-description keys
+   * and throws an `Error` if not.
+   *
+   * @method _checkForChildren
+   * @param modelDescriptionKeys
+   * @param childKeys
+   * @returns {Boolean} `true` if all child-keys are also present in the parent model-description.
+   * @throws {Error} if not all child-keys are defined in the parent model-description.
+   * @private
+   */
   _checkForChildren: function (modelDescriptionKeys, childKeys) {
     return childKeys.every(function (key) {
       if(modelDescriptionKeys.indexOf(key) > -1) {
@@ -294,4 +305,4 @@ var Molder = {
   }
 };
 
-module.exports = Molder;
+module.exports = JsonMolder;

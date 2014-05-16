@@ -65,7 +65,7 @@ var ModelDescription = {
    * any of the origin (JSON) object's "primitive' data type values.
    * <p>
    *   The properties `origin` and `namespaceExtractor` are injected
-   *   by the `Molder`.
+   *   by the `JsonMolder`.
    *
    * For example:
    * ```
@@ -84,7 +84,7 @@ var ModelDescription = {
    * ```
    *
    * @param {JSON|Object}             origin              This JSON origin.
-   * @param {Function}                namespaceExtractor  The namespace extractor function of the Molder.
+   * @param {Function}                namespaceExtractor  The namespace extractor function of the JsonMolder.
    * @returns {String}
    */
   statusPhrase: function (origin, namespaceExtractor) {
