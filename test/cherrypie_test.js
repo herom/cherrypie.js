@@ -1,7 +1,7 @@
 var should = require('should'),
-    Molder = require('../index');
+    Cherrypie = require('../index');
 
-describe("JsonMolder", function () {
+describe("Cherrypie", function () {
   describe("#populate()", function () {
     it("Should return the namespace-reduced origin", function () {
       var origin = {
@@ -16,7 +16,7 @@ describe("JsonMolder", function () {
           namespace = 'session.user.activities',
           result;
 
-      result = Molder.extractNamespace(origin, namespace);
+      result = Cherrypie.extractNamespace(origin, namespace);
 
       result.should.have.property('running', 'hooray');
     });
@@ -36,7 +36,7 @@ describe("JsonMolder", function () {
           },
           parsedResult;
 
-      parsedResult = Molder.populate(modelDescription, response);
+      parsedResult = Cherrypie.populate(modelDescription, response);
 
       parsedResult.should.have.property('status', 'clean');
     });
@@ -57,7 +57,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, response);
+      model = Cherrypie.populate(modelDescription, response);
 
       model.should.have.property('status', 'clean');
     });
@@ -88,7 +88,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       model.should.have.property('favCar', 'Batmobil');
     });
@@ -115,8 +115,8 @@ describe("JsonMolder", function () {
           description = {
             __namespace: 'session.user',
             nickname: 'nickname',
-            statusPhrase: function (origin, molder) {
-              var status = molder.extractNamespace(origin, 'mood.currentStatus'),
+            statusPhrase: function (origin, cherrypie) {
+              var status = cherrypie.extractNamespace(origin, 'mood.currentStatus'),
                   person = this.nickname;
 
               return person + ' is ' + status;
@@ -125,7 +125,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       model.should.have.property('statusPhrase', 'Batman is happy');
     });
@@ -143,7 +143,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       should(model).eql(null);
     });
@@ -167,7 +167,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       should(model).eql(null);
     });
@@ -192,7 +192,7 @@ describe("JsonMolder", function () {
           description = {
             __namespace: 'session.user',
 
-            comments: function (preparedOrigin, molder) {
+            comments: function (preparedOrigin, cherrypie) {
               var comments = preparedOrigin.comments,
                   commentDescripton = {
                     id: 'commentId',
@@ -203,7 +203,7 @@ describe("JsonMolder", function () {
               if (comments) {
                 preparedComments = [];
                 comments.forEach(function (comment) {
-                  preparedComments.push(molder.populate(commentDescripton, comment));
+                  preparedComments.push(cherrypie.populate(commentDescripton, comment));
                 });
               }
 
@@ -226,7 +226,7 @@ describe("JsonMolder", function () {
 
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       should(model).eql(expectedModel);
     });
@@ -268,7 +268,7 @@ describe("JsonMolder", function () {
 
           model;
 
-      model = Molder.populate(description, origin);
+      model = Cherrypie.populate(description, origin);
 
       should(model).eql(expectedModel);
     });
@@ -282,7 +282,7 @@ describe("JsonMolder", function () {
         }
       }, res;
 
-      res = Molder.extractNamespace(origin, 'session.user');
+      res = Cherrypie.extractNamespace(origin, 'session.user');
 
       should(res).eql(null);
     });
@@ -329,7 +329,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -423,7 +423,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -480,7 +480,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -511,7 +511,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -548,7 +548,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -585,7 +585,7 @@ describe("JsonMolder", function () {
           },
           model;
 
-      model = Molder.populate(modelDescription, origin);
+      model = Cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -614,7 +614,7 @@ describe("JsonMolder", function () {
             }
           };
 
-      should(Molder.populate.bind(this, modelDescription, origin)).throw(Error);
+      should(Cherrypie.populate.bind(this, modelDescription, origin)).throw(Error);
     });
   });
 
@@ -632,7 +632,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder._generateNamespacedContainer(namespace);
+      result = Cherrypie._generateNamespacedContainer(namespace);
 
       should(result).eql(expected);
     });
@@ -644,7 +644,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder._generateNamespacedContainer(namespace);
+      result = Cherrypie._generateNamespacedContainer(namespace);
 
       should(result).eql(expected);
     });
@@ -667,7 +667,7 @@ describe("JsonMolder", function () {
           serializedProperties = ['id', 'text'],
           result;
 
-      result = Molder._serialize(modelDescription, model, serializedProperties);
+      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
@@ -690,7 +690,7 @@ describe("JsonMolder", function () {
           serializedProperties = ['id', 'text'],
           result;
 
-      result = Molder._serialize(modelDescription, model, serializedProperties);
+      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
@@ -713,7 +713,7 @@ describe("JsonMolder", function () {
           serializedProperties = ['text'],
           result;
 
-      result = Molder._serialize(modelDescription, model, serializedProperties);
+      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
@@ -734,7 +734,7 @@ describe("JsonMolder", function () {
           },
           reducedModel;
 
-      reducedModel = Molder.desolate(modelDescription, model);
+      reducedModel = Cherrypie.desolate(modelDescription, model);
 
       reducedModel.should.not.have.property('name');
     });
@@ -752,7 +752,7 @@ describe("JsonMolder", function () {
           },
           reducedModel;
 
-      reducedModel = Molder.desolate(modelDescription, model);
+      reducedModel = Cherrypie.desolate(modelDescription, model);
 
       reducedModel.should.not.have.property('namespace');
     });
@@ -775,7 +775,7 @@ describe("JsonMolder", function () {
             }
           };
 
-      should(Molder.desolate.bind(this, modelDescription, model)).throw(Error);
+      should(Cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
     });
 
     it("Should desolate a simple model", function () {
@@ -797,7 +797,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder.desolate(modelDescription, model);
+      result = Cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -837,7 +837,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder.desolate(modelDescription, model);
+      result = Cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -884,7 +884,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder.desolate(modelDescription, model);
+      result = Cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -925,7 +925,7 @@ describe("JsonMolder", function () {
           },
           result;
 
-      result = Molder.desolate(modelDescription, model);
+      result = Cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -962,7 +962,7 @@ describe("JsonMolder", function () {
             authorsCount: 4
           };
 
-      should(Molder.desolate.bind(this, modelDescription, model)).throw(Error);
+      should(Cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
     });
   });
 });

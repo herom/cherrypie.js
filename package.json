@@ -1,7 +1,7 @@
 {
-  "name": "json-molder",
+  "name": "cherrypie.js",
   "description": "Populate/desolate (alias convert) a Rich Model Object from/to JSON",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "contributors": [
     {
@@ -17,7 +17,6 @@
     "test": "node_modules/.bin/mocha"
   },
   "main": "./index",
-  "dependencies": {},
   "devDependencies": {
     "mocha": "*",
     "should": "*",
@@ -26,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/herom/json-molder.git"
+    "url": "git://github.com/herom/cherrypie.js.git"
   },
   "bugs": {
     "url": "https://github.com/herom/json-molder/issues"

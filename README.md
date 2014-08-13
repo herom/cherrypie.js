@@ -1,10 +1,10 @@
-#json-molder
-[![Build Status](https://travis-ci.org/herom/json-molder.svg?branch=master)](https://travis-ci.org/herom/json-molder)
+#cherrypie.js
+[![Build Status](https://travis-ci.org/herom/cherrypie.js.svg?branch=master)](https://travis-ci.org/herom/cherrypie.js)
 
-**json-molder** is just another model populating model-factory which helps you to convert your incoming JSON
+**cherrypie.js** is just another model populating model-factory which helps you to convert your incoming JSON
 object into a simpler model object and vice versa with the help of a so called *model-description*. 
 
-With **json-molder** you're able to get the primitive "namespaced" object values as well as "computed" properties which
+With **cherrypie.js** you're able to get the primitive "namespaced" object values as well as "computed" properties which
 depend on a number of values from the received JSON, as well as reduce/desolate the "rich" model
 object back to the object which is expected at the backend.
 

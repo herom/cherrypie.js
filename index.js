@@ -1,11 +1,11 @@
 /**
- * Use the Molder to populate models from an (JSON) origin and desolate rich models in an intuitive way.
+ * Use cherrypie.js to populate models from an (JSON) origin and desolate rich models in an intuitive way.
  *
- * @class JsonMolder
- * @module json-molder
+ * @class Cherrypie
+ * @module cherrypie.js
  * @static
  */
-var JsonMolder = {
+var Cherrypie = {
   /**
    * Takes the given model description along with the origin (JSON) object
    * and returns the populated model.
@@ -193,7 +193,7 @@ var JsonMolder = {
     for(var i = 0; i < serializableProperties.length; i++) {
       if(typeof modelDescription[serializableProperties[i]] === 'function') {
         throw new Error(
-            'json-molder#desolate(): Unable to serialize a "computedProperty" found in the Array ' +
+            'cherrypiejs#desolate(): Unable to serialize a "computedProperty" found in the Array ' +
                 'of serializable properties (namespace: '+ namespace +')!'
         );
       }
@@ -305,4 +305,4 @@ var JsonMolder = {
   }
 };
 
-module.exports = JsonMolder;
+module.exports = Cherrypie;
