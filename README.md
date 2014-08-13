@@ -1,4 +1,5 @@
 #cherrypie.js
+[![NPM](https://nodei.co/npm/cherrypie.js.png)](https://npmjs.org/package/cherrypie.js)
 [![Build Status](https://travis-ci.org/herom/cherrypie.js.svg?branch=master)](https://travis-ci.org/herom/cherrypie.js)
 
 **cherrypie.js** is just another model populating model-factory which helps you to convert your incoming JSON
