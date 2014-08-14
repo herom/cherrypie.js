@@ -1,6 +1,1 @@
-.idea
-node_modules
-npm-debug.log
-
-*.iml
-*.bak
+_site
