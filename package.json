@@ -1,7 +1,7 @@
 {
   "name": "cherrypie.js",
   "description": "Populate/desolate (alias convert) a Rich Model Object from/to JSON",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Heinz Romirer <h.romirer@gmail.com>",
   "contributors": [
     {
