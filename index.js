@@ -1,3 +1,6 @@
+var oKeys = Object.keys;
+var isArray = Array.isArray;
+
 /**
  * Use cherrypie.js to populate models from an (JSON) origin and desolate rich models in an intuitive way.
  *
@@ -16,61 +19,52 @@ var Cherrypie = {
    * @returns {Object}
    */
   populate: function (modelDescription, origin) {
-    var keys = Object.keys(modelDescription),
-        preparedOrigin = {},
-        computedProperties = [],
-        childDescriptions = {},
-        model = {};
+    var context = this;
+    var keys = oKeys(modelDescription);
+    var preparedOrigin = modelDescription.__namespace ? this.extractNamespace(origin, modelDescription.__namespace) : origin;
+    var computedProperties = [];
+    var childDescriptions = modelDescription.__children || {};
+    var model = {};
 
-    if (modelDescription.hasOwnProperty('__namespace')) {
-      preparedOrigin = this.extractNamespace(origin, modelDescription.__namespace);
-      keys.splice(keys.indexOf('__namespace'), 1);
-    } else {
-      preparedOrigin = origin;
-    }
+    keys = keys.filter(function filterMetaKeyNames(keyName) {
+      return !/^__/.test(keyName);
+    });
 
-    if (modelDescription.hasOwnProperty('__serializable')) {
-      keys.splice(keys.indexOf('__serializable'), 1);
-    }
-
-    if (modelDescription.hasOwnProperty('__children')) {
-      childDescriptions = modelDescription.__children;
-      keys.splice(keys.indexOf('__children'), 1);
-    }
-
-    this._checkForChildren(keys,  Object.keys(childDescriptions));
+    this._checkForChildren(keys, oKeys(childDescriptions));
 
     keys.forEach(function (key) {
-      var value = modelDescription[key],
-          parsedValue;
+      var value = modelDescription[key];
 
       if (typeof value === 'function') {
         // keep computed properties to evaluate them after the ordinary properties have been evaluated.
         // the evaluated properties will be accessible within the property function.
         computedProperties.push(key);
       } else if (preparedOrigin) {
+        var parsedValue;
+
         if (preparedOrigin.hasOwnProperty(value)) {
           parsedValue = preparedOrigin[value];
         } else {
-          parsedValue = this.extractNamespace(preparedOrigin, value);
+          parsedValue = context.extractNamespace(preparedOrigin, value);
         }
 
-        if (childDescriptions.hasOwnProperty(key)) {
-          var children = parsedValue,
-              childDescription = childDescriptions[key],
-              childModel;
+        if (childDescriptions[key]) {
+          var childDescription = childDescriptions[key];
+          var childModel;
 
-          if (Array.isArray(children)) {
+          if (isArray(parsedValue)) {
+            var children = parsedValue.slice();
             parsedValue = [];
+
             children.forEach(function (child) {
-              childModel = this.populate(childDescription, child);
+              childModel = context.populate(childDescription, child);
               if (childModel) {
                 parsedValue.push(childModel);
               }
-            }.bind(this));
+            });
 
-          } else if (typeof children === 'object') {
-            childModel = this.populate(childDescription, children);
+          } else if (typeof parsedValue === 'object') {
+            childModel = context.populate(childDescription, parsedValue);
             if (childModel) {
               parsedValue = childModel;
             }
@@ -79,18 +73,18 @@ var Cherrypie = {
 
         model[key] = parsedValue;
       }
-    }.bind(this));
+    });
 
     computedProperties.forEach(function (key) {
       if (preparedOrigin) {
         var fn = modelDescription[key];
-        model[key] = fn.call(model, preparedOrigin, this);
+        model[key] = fn.call(model, preparedOrigin, context);
       } else {
         model[key] = null;
       }
-    }.bind(this));
+    });
 
-    if (Object.keys(model).length <= 0) {
+    if (!oKeys(model).length) {
       model = null;
     }
 
@@ -110,7 +104,7 @@ var Cherrypie = {
    */
   _checkForChildren: function (modelDescriptionKeys, childKeys) {
     return childKeys.every(function (key) {
-      if(modelDescriptionKeys.indexOf(key) > -1) {
+      if (modelDescriptionKeys.indexOf(key) > -1) {
         return true;
       } else {
         throw new Error('Child ' + key + ' declared in __children but not in parent model description!');
@@ -130,9 +124,9 @@ var Cherrypie = {
     var namespacedOrigin = null;
 
     if (typeof namespace === 'string' && namespace.indexOf('.') > -1) {
-      var splittedNamespace = namespace.split('.'),
-          namespaceKey,
-          iterator = 0;
+      var splittedNamespace = namespace.split('.');
+      var namespaceKey;
+      var iterator = 0;
 
       namespacedOrigin = origin;
 
@@ -170,49 +164,42 @@ var Cherrypie = {
    * @returns {Object} The plain desolated/reduced model.
    */
   desolate: function (modelDescription, model) {
-    var namespace = modelDescription.__namespace,
-        serializableProperties = [],
-        desolatedModel = null,
-        childModels = null;
+    var context = this;
+    var namespace = modelDescription.__namespace;
+    var serializablePropertyNames = modelDescription.__serializable;
+    var desolatedModel = null;
+    var childModels = null;
 
-    if ('__serializable' in modelDescription) {
-      serializableProperties = modelDescription.__serializable;
-    } else {
-      serializableProperties = Object.keys(modelDescription);
-
-      var serializedClone = serializableProperties.slice();
-
-      serializedClone.every(function (clone, index) {
-        if (clone.match(/^__/)) {
-          serializableProperties.splice(index, 1);
-        }
+    if (!isArray(serializablePropertyNames)) {
+      serializablePropertyNames = oKeys(modelDescription).filter(function removeUnserializableProperties(name) {
+        return !/^__/.test(name);
       });
     }
 
     // check if any computed properties are defined to be serialized
-    for(var i = 0; i < serializableProperties.length; i++) {
-      if(typeof modelDescription[serializableProperties[i]] === 'function') {
+    serializablePropertyNames.forEach(function checkForComputedProperties(name) {
+      if (typeof modelDescription[name] === 'function') {
         throw new Error(
             'cherrypiejs#desolate(): Unable to serialize a "computedProperty" found in the Array ' +
-                'of serializable properties (namespace: '+ namespace +')!'
+            'of serializable properties (namespace: ' + namespace + ')!'
         );
       }
-    }
+    });
 
-
-    if ('__children' in modelDescription) {
-      var childKeys = Object.keys(modelDescription.__children);
+    if (modelDescription.__children) {
+      var childKeys = oKeys(modelDescription.__children);
       childModels = {};
 
       childKeys.forEach(function (childKey) {
-        if (serializableProperties.indexOf(childKey) > -1) {
-          serializableProperties.splice(serializableProperties.indexOf(childKey), 1);
-          childModels[childKey] = this.desolate(modelDescription.__children[childKey], model[childKey]);
+        var keyIndex = serializablePropertyNames.indexOf(childKey);
+        if (keyIndex !== -1) {
+          serializablePropertyNames.splice(keyIndex, 1);
+          childModels[childKey] = context.desolate(modelDescription.__children[childKey], model[childKey]);
         }
-      }.bind(this));
+      });
     }
 
-    desolatedModel = this._serialize(modelDescription, model, serializableProperties);
+    desolatedModel = this._serialize(modelDescription, model, serializablePropertyNames);
 
     if (desolatedModel && childModels) {
       for (var childModel in childModels) {
@@ -242,14 +229,15 @@ var Cherrypie = {
   _serialize: function (modelDescription, model, serializableProperties) {
     var serialized;
 
-    if (Array.isArray(model) && model.length > 0) {
+    if (isArray(model) && model.length) {
       var serializedObject = {};
       serialized = [];
+
       model.forEach(function (obj) {
         serializedObject = {};
 
         for (var prop in obj) {
-          if (obj.hasOwnProperty(prop) && serializableProperties.indexOf(prop) > -1) {
+          if (obj.hasOwnProperty(prop) && serializableProperties.indexOf(prop) !== -1) {
             serializedObject[modelDescription[prop]] = obj[prop];
           }
         }
@@ -263,7 +251,7 @@ var Cherrypie = {
       for (var prop in model) {
         propertyIndex = serializableProperties.indexOf(prop);
 
-        if (propertyIndex > -1 && model.hasOwnProperty(prop)) {
+        if (propertyIndex !== -1 && model[prop]) {
           serialized[modelDescription[prop]] = model[prop];
           serializableProperties.splice(propertyIndex, 1);
         }
@@ -291,8 +279,8 @@ var Cherrypie = {
     }
 
     if (typeof namespace === 'string') {
-      var parts = namespace.split('.'),
-          tmpObj;
+      var parts = namespace.split('.');
+      var tmpObj;
 
       for (var i = parts.length - 1; i >= 0; i--) {
         tmpObj = {};
