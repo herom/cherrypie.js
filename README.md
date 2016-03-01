@@ -168,7 +168,7 @@ Received JSON:
       "firstName": "Bruce",
       "lastName": "Wayne",
       "nick": "Batman",
-      "comments": [
+      "userComments": [
         {
           commentId: 'c01',
           commentText: 'some text'
@@ -185,6 +185,8 @@ Received JSON:
 
 Model Description:
 ```
+// be aware that the `__children` property names must match the "new" property names of the model
+// and not the one of the original JSON!
 {
   __namespace: 'session.user',
   firstName: 'firstName',
@@ -192,7 +194,7 @@ Model Description:
   name: function () {
     return this.firstName + ' ' + this.lastName;
   },
-  comments: 'comments',
+  comments: 'userComments',
   __children: {
     comments: {
       id: 'commentId',
