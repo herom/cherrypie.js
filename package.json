@@ -14,13 +14,17 @@
     }
   ],
   "scripts": {
-    "test": "node_modules/.bin/mocha"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "main": "./index",
   "devDependencies": {
+    "coveralls": "^2.11.8",
+    "istanbul": "^0.4.2",
     "mocha": "*",
-    "should": "*",
-    "mocha-jshint": "0.0.7"
+    "mocha-jshint": "0.0.7",
+    "mocha-lcov-reporter": "^1.2.0",
+    "should": "*"
   },
   "license": "MIT",
   "repository": {
@@ -29,5 +33,8 @@
   },
   "bugs": {
     "url": "https://github.com/herom/cherrypie.js/issues"
+  },
+  "dependencies": {
+    "lodash": "^4.6.1"
   }
 }
