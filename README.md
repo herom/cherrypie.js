@@ -1,6 +1,7 @@
 #cherrypie.js
 [![NPM](https://nodei.co/npm/cherrypie.js.png)](https://npmjs.org/package/cherrypie.js)
 [![Build Status](https://travis-ci.org/herom/cherrypie.js.svg?branch=master)](https://travis-ci.org/herom/cherrypie.js)
+[![Coverage Status](https://coveralls.io/repos/github/herom/cherrypie.js/badge.svg?branch=master)](https://coveralls.io/github/herom/cherrypie.js?branch=master)
 
 **cherrypie.js** is a **dead simple, yet powerful JSON-to-rich-model converter** which helps you to convert your incoming JSON
 object into a more convenient model object and vice versa with the help of a so called *model-description*.
