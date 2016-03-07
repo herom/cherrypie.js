@@ -1,7 +1,10 @@
-var should = require('should'),
-    Cherrypie = require('../index');
+var should = require('should');
+var cherrypie = require('../index');
+var get = require('lodash').get;
 
-describe("Cherrypie", function () {
+should.warn = false;
+
+describe("cherrypie", function () {
   describe("#populate()", function () {
     it("Should return the namespace-reduced origin", function () {
       var origin = {
@@ -16,7 +19,7 @@ describe("Cherrypie", function () {
           namespace = 'session.user.activities',
           result;
 
-      result = Cherrypie.extractNamespace(origin, namespace);
+      result = get(origin, namespace);
 
       result.should.have.property('running', 'hooray');
     });
@@ -36,7 +39,7 @@ describe("Cherrypie", function () {
           },
           parsedResult;
 
-      parsedResult = Cherrypie.populate(modelDescription, response);
+      parsedResult = cherrypie.populate(modelDescription, response);
 
       parsedResult.should.have.property('status', 'clean');
     });
@@ -57,7 +60,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, response);
+      model = cherrypie.populate(modelDescription, response);
 
       model.should.have.property('status', 'clean');
     });
@@ -88,7 +91,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       model.should.have.property('favCar', 'Batmobil');
     });
@@ -115,8 +118,8 @@ describe("Cherrypie", function () {
           description = {
             __namespace: 'session.user',
             nickname: 'nickname',
-            statusPhrase: function (origin, cherrypie) {
-              var status = cherrypie.extractNamespace(origin, 'mood.currentStatus'),
+            statusPhrase: function (origin) {
+              var status = get(origin, 'mood.currentStatus'),
                   person = this.nickname;
 
               return person + ' is ' + status;
@@ -125,7 +128,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       model.should.have.property('statusPhrase', 'Batman is happy');
     });
@@ -143,7 +146,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       should(model).eql(null);
     });
@@ -167,7 +170,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       should(model).eql(null);
     });
@@ -226,7 +229,7 @@ describe("Cherrypie", function () {
 
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       should(model).eql(expectedModel);
     });
@@ -268,7 +271,7 @@ describe("Cherrypie", function () {
 
           model;
 
-      model = Cherrypie.populate(description, origin);
+      model = cherrypie.populate(description, origin);
 
       should(model).eql(expectedModel);
     });
@@ -282,7 +285,7 @@ describe("Cherrypie", function () {
         }
       }, res;
 
-      res = Cherrypie.extractNamespace(origin, 'session.user');
+      res = get(origin, 'session.user');
 
       should(res).eql(null);
     });
@@ -329,7 +332,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -423,7 +426,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -480,7 +483,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -511,7 +514,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -548,7 +551,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -585,7 +588,7 @@ describe("Cherrypie", function () {
           },
           model;
 
-      model = Cherrypie.populate(modelDescription, origin);
+      model = cherrypie.populate(modelDescription, origin);
 
       should(model).eql(expectedModel);
     });
@@ -614,44 +617,12 @@ describe("Cherrypie", function () {
             }
           };
 
-      should(Cherrypie.populate.bind(this, modelDescription, origin)).throw(Error);
-    });
-  });
-
-  describe("#_generateNamespacedContainer()", function () {
-    it("Should return a namespaced container object if a namespace is given", function () {
-      var namespace = 'batman.batcave.batcar',
-          expected = {
-            batman: {
-              batcave: {
-                batcar: {
-
-                }
-              }
-            }
-          },
-          result;
-
-      result = Cherrypie._generateNamespacedContainer(namespace);
-
-      should(result).eql(expected);
-    });
-
-    it("Should work with a one-dimensional namespace", function () {
-      var namespace = 'batman',
-          expected = {
-            batman: {}
-          },
-          result;
-
-      result = Cherrypie._generateNamespacedContainer(namespace);
-
-      should(result).eql(expected);
+      should(cherrypie.populate.bind(this, modelDescription, origin)).throw(Error);
     });
   });
 
   describe("#_serialize()", function () {
-    it("Should serialize the given properties", function () {
+    it("Should desolate the given properties", function () {
       var modelDescription = {
             id: 'serverId',
             text: 'serverText'
@@ -667,12 +638,12 @@ describe("Cherrypie", function () {
           serializedProperties = ['id', 'text'],
           result;
 
-      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
+      result = cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
 
-    it("Should serialize the given array", function () {
+    it("Should desolate the given array", function () {
       var modelDescription = {
             id: 'serverId',
             text: 'serverText'
@@ -690,12 +661,12 @@ describe("Cherrypie", function () {
           serializedProperties = ['id', 'text'],
           result;
 
-      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
+      result = cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
 
-    it("Should serialize the given array in respect of the given serialized properties", function () {
+    it("Should desolate the given array in respect of the given serialized properties", function () {
       var modelDescription = {
             id: 'serverId',
             text: 'serverText'
@@ -713,7 +684,7 @@ describe("Cherrypie", function () {
           serializedProperties = ['text'],
           result;
 
-      result = Cherrypie._serialize(modelDescription, model, serializedProperties);
+      result = cherrypie._serialize(modelDescription, model, serializedProperties);
 
       should(result).eql(expected);
     });
@@ -734,7 +705,7 @@ describe("Cherrypie", function () {
           },
           reducedModel;
 
-      reducedModel = Cherrypie.desolate(modelDescription, model);
+      reducedModel = cherrypie.desolate(modelDescription, model);
 
       reducedModel.should.not.have.property('name');
     });
@@ -752,7 +723,7 @@ describe("Cherrypie", function () {
           },
           reducedModel;
 
-      reducedModel = Cherrypie.desolate(modelDescription, model);
+      reducedModel = cherrypie.desolate(modelDescription, model);
 
       reducedModel.should.not.have.property('namespace');
     });
@@ -775,7 +746,7 @@ describe("Cherrypie", function () {
             }
           };
 
-      should(Cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
+      should(cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
     });
 
     it("Should desolate a simple model", function () {
@@ -797,7 +768,7 @@ describe("Cherrypie", function () {
           },
           result;
 
-      result = Cherrypie.desolate(modelDescription, model);
+      result = cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -837,7 +808,7 @@ describe("Cherrypie", function () {
           },
           result;
 
-      result = Cherrypie.desolate(modelDescription, model);
+      result = cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -884,7 +855,7 @@ describe("Cherrypie", function () {
           },
           result;
 
-      result = Cherrypie.desolate(modelDescription, model);
+      result = cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -925,7 +896,7 @@ describe("Cherrypie", function () {
           },
           result;
 
-      result = Cherrypie.desolate(modelDescription, model);
+      result = cherrypie.desolate(modelDescription, model);
 
       should(result).eql(expected);
     });
@@ -962,7 +933,7 @@ describe("Cherrypie", function () {
             authorsCount: 4
           };
 
-      should(Cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
+      should(cherrypie.desolate.bind(this, modelDescription, model)).throw(Error);
     });
   });
 });
