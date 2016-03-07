@@ -2,8 +2,8 @@
 [![NPM](https://nodei.co/npm/cherrypie.js.png)](https://npmjs.org/package/cherrypie.js)
 [![Build Status](https://travis-ci.org/herom/cherrypie.js.svg?branch=master)](https://travis-ci.org/herom/cherrypie.js)
 
-**cherrypie.js** is just another model populating model-factory which helps you to convert your incoming JSON
-object into a simpler model object and vice versa with the help of a so called *model-description*. 
+**cherrypie.js** is a **dead simple, yet powerful JSON-to-rich-model converter** which helps you to convert your incoming JSON
+object into a more convenient model object and vice versa with the help of a so called *model-description*.
 
 With **cherrypie.js** you're able to get the primitive "namespaced" object values as well as "computed" properties which
 depend on a number of values from the received JSON, as well as reduce/desolate the "rich" model
