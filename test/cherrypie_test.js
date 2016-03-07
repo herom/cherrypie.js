@@ -287,7 +287,7 @@ describe("cherrypie", function () {
 
       res = get(origin, 'session.user');
 
-      should(res).eql(null);
+      should(res).be.type('undefined');
     });
 
     it("Should return the right child properties using a child model-description", function () {
