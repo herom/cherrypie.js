@@ -10,6 +10,19 @@ With **cherrypie.js** you're able to get the primitive "namespaced" object value
 depend on a number of values from the received JSON, as well as reduce/desolate the "rich" model
 object back to the object which is expected at the backend.
 
+There are a few "switches" and "directives" which are unique to each `modelDescription` and can be used to instruct cherrypie
+how to process the incoming JSON object. All model descriptions are nestable (as each model description could have a infinite
+number of nested `__children`).
+
+```
+{
+  __namespace: String, // the "namespace" of the incoming JSON (if the values you want are "nested") - __namespace can be nested
+  __children: Object, // an object which holds at least one child model description - __children can be nested
+  __transferKeys: Boolean // tell cherrypie.js to only process the described properties and take the others "as is"
+  __serializable: [String] // the list of serializable properties when `model.serialize` is called
+}
+```
+
 ##JSON-to-Rich-Model Examples
 
 ###Parse values from JSON
@@ -225,6 +238,73 @@ Populated Model:
     }
   ]
   __serializable: ['firstName', 'lastName', 'nick']
+}
+```
+
+###Parse and process only the described properties and take the others "as is"
+
+Make use of the `__transferKeys` switch in order to tell `cherrypie.js` to process the descriptions
+given by the `modelDescription` and transfer the keys which are not explicitly described "as is" from
+the origin object.
+
+Received JSON:
+```
+{
+  "session": {
+    "user": {
+      "firstName": "Bruce",
+      "lastName": "Wayne",
+      "nick": "Batman",
+      "userComments": [
+        {
+          commentId: 'c01',
+          commentText: 'some text'
+        },
+        {
+          commentId: 'c02',
+          commentText: 'another text'
+        }
+      ]
+    }
+  }
+}
+```
+
+Model Description:
+```
+{
+  __namespace: 'session.user',
+  __transferKeys: true,
+  fullName: function (preparedOrigin) {
+    return preparedOrigin.firstName + ' ' + preparedOrigin.lastName;
+  },
+  comments: 'userComments',
+  __children: {
+    comments: {
+      __transferKeys,
+      id: 'commentId'
+    }
+  }
+}
+```
+
+Populated Model:
+```
+{
+  firstName: 'Bruce',
+  lastName: 'Wayne',
+  fullName: 'Bruce Wayne',
+  nick: 'Batman',
+  comments: [
+    {
+      id: 'c01',
+      commentText: 'some text'
+    },
+    {
+      id: 'c02',
+      commentText: 'another text'
+    }
+  ]
 }
 ```
 

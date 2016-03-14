@@ -1,11 +1,13 @@
 var oKeys = Object.keys;
-var isArray = Array.isArray;
 var _ = require('lodash');
 var get = _.get;
 var set = _.set;
 var diff = _.difference;
 var intersect = _.intersection;
+var union = _.union;
+var compact = _.compact;
 var isFunction = _.isFunction;
+var isArray = _.isArray;
 var logPrefix = '<cherrypie>';
 
 function filterMetaKeyNames(name) {
@@ -33,6 +35,8 @@ module.exports = {
     var context = this;
     var preparedOrigin = modelDescription.__namespace ? get(origin, modelDescription.__namespace) : origin;
     var childDescriptions = modelDescription.__children || {};
+    var shouldTransferKeys = !!modelDescription.__transferKeys;
+    var transferredKeys = [];
     var keys = oKeys(modelDescription).filter(filterMetaKeyNames);
     var computedProperties = keys.filter(function (key) {
       return isFunction(modelDescription[key]);
@@ -42,6 +46,10 @@ module.exports = {
     keys = diff(keys, computedProperties);
 
     this._checkForChildren(keys, oKeys(childDescriptions));
+
+    if (shouldTransferKeys) {
+      transferredKeys = this._getTransferredKeys(keys, preparedOrigin, modelDescription, childDescriptions);
+    }
 
     if (preparedOrigin) {
       keys.forEach(function (key) {
@@ -56,13 +64,19 @@ module.exports = {
             }).filter(function (populatedChild) {
               return !!populatedChild;
             });
-          } else if (typeof parsedValue === 'object') {
+          } else if (parsedValue && typeof parsedValue === 'object') {
             parsedValue = context.populate(childDescription, parsedValue);
             }
           }
 
         model[key] = parsedValue;
       });
+
+      if (shouldTransferKeys) {
+        diff(transferredKeys, keys).forEach(function (transferredKey) {
+          model[transferredKey] = preparedOrigin[transferredKey];
+        });
+      }
     }
 
     if (preparedOrigin) {
@@ -198,5 +212,39 @@ module.exports = {
     }
 
     return serialized;
+  },
+
+  /**
+   * Extracts the "transferred" keys (the keys which are not defined within the model description and should
+   * therefor be copied unprocessed into the resulting model).
+   *
+   * @method _getTransferredKeys
+   * @param [String]                processedKeys         The list of processed keys which are described within the model description.
+   * @param {Object}                preparedOrigin        The prepared JSON origin object.
+   * @param {Object}                modelDescription      The current model description object.
+   * @param {Object}                childDescriptions     The `__children` property of the current model description.
+   * @returns {[String]}
+   * @private
+   */
+  _getTransferredKeys: function getTransferredKeys (processedKeys, preparedOrigin, modelDescription, childDescriptions) {
+    var descriptionValues = compact(oKeys(modelDescription).filter(filterMetaKeyNames).map(function (modelKey) {
+      var value = modelDescription[modelKey];
+
+      if (typeof value === 'string') {
+        return value;
+      }
+    }));
+
+    oKeys(childDescriptions).forEach(function (childPropertyKey) {
+      var sanitizedChildPropertyKey = modelDescription[childPropertyKey] && modelDescription[childPropertyKey].split('.')[0];
+
+      if (sanitizedChildPropertyKey) {
+        descriptionValues.push(sanitizedChildPropertyKey);
+      }
+    });
+
+    return union(oKeys(preparedOrigin).filter(filterMetaKeyNames), processedKeys).filter(function (unionKey) {
+      return descriptionValues.indexOf(unionKey) === -1;
+    });
   }
 };

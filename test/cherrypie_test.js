@@ -619,6 +619,53 @@ describe("cherrypie", function () {
 
       should(cherrypie.populate.bind(this, modelDescription, origin)).throw(Error);
     });
+
+    it('should populate a model and respect the `__transferKeys` property in order to only overwrite the properties in the defined model description', function () {
+      var someFun = function someFun (arg1, arg2) {
+        return arg1 + arg2;
+      };
+      var origin = {
+            session: {
+              sessionName: "Authentication",
+              sessionId: 2016,
+              someCrudeProperty: 'really crude things happen to me',
+              someFun: someFun,
+              detail: {
+                action: {
+                  actionId: 1,
+                  name: "login",
+                  result: "yeehaa!"
+                }
+              }
+            }
+          };
+          var modelDescription = {
+            __namespace: 'session',
+            __transferKeys: true,
+            name: 'sessionName',
+            action: 'detail.action',
+            __children: {
+              action: {
+                __transferKeys: true,
+                id: 'actionId'
+              }
+            }
+          };
+          var expectedModel = {
+            name: 'Authentication',
+            sessionId: 2016,
+            someCrudeProperty: 'really crude things happen to me',
+            someFun: someFun,
+            action: {
+              id: 1,
+              name: 'login',
+              result: 'yeehaa!'
+            }
+          };
+          var model = cherrypie.populate(modelDescription, origin);
+
+      should(model).deepEqual(expectedModel);
+    });
   });
 
   describe("#_serialize()", function () {
