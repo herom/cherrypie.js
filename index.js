@@ -1,5 +1,5 @@
-var oKeys = Object.keys;
 var _ = require('lodash');
+var oKeys = _.keys;
 var get = _.get;
 var set = _.set;
 var diff = _.difference;
