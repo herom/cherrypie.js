@@ -10,7 +10,7 @@ var isFunction = _.isFunction;
 var isArray = _.isArray;
 var logPrefix = '<cherrypie>';
 
-function filterMetaKeyNames(name) {
+function filterMetaKeyNames (name) {
   return !/^__/.test(name);
 }
 
@@ -36,6 +36,7 @@ module.exports = {
     var preparedOrigin = modelDescription.__namespace ? get(origin, modelDescription.__namespace) : origin;
     var childDescriptions = modelDescription.__children || {};
     var shouldTransferKeys = !!modelDescription.__transferKeys;
+    var shouldIgnoreKeys = shouldTransferKeys && !!modelDescription.__ignoredKeys;
     var transferredKeys = [];
     var keys = oKeys(modelDescription).filter(filterMetaKeyNames);
     var computedProperties = keys.filter(function (key) {
@@ -51,10 +52,14 @@ module.exports = {
       transferredKeys = this._getTransferredKeys(keys, preparedOrigin, modelDescription, childDescriptions);
     }
 
+    if (shouldIgnoreKeys) {
+      transferredKeys = diff(transferredKeys, modelDescription.__ignoredKeys);
+    }
+
     if (preparedOrigin) {
       keys.forEach(function (key) {
         var value = modelDescription[key];
-          var childDescription = childDescriptions[key];
+        var childDescription = childDescriptions[key];
         var parsedValue = preparedOrigin.hasOwnProperty(value) ? preparedOrigin[value] : get(preparedOrigin, value);
 
         if (childDescription) {
@@ -66,8 +71,8 @@ module.exports = {
             });
           } else if (parsedValue && typeof parsedValue === 'object') {
             parsedValue = context.populate(childDescription, parsedValue);
-            }
           }
+        }
 
         model[key] = parsedValue;
       });
@@ -141,7 +146,7 @@ module.exports = {
     }
 
     // check if any computed properties are defined to be serialized
-    serializablePropertyNames.forEach(function checkForComputedProperties(name) {
+    serializablePropertyNames.forEach(function checkForComputedProperties (name) {
       if (typeof modelDescription[name] === 'function') {
         throw new Error(
             logPrefix + ' Unable to desolate a computed property ("' + name + '") found in the Array ' +
@@ -219,14 +224,16 @@ module.exports = {
    * therefor be copied unprocessed into the resulting model).
    *
    * @method _getTransferredKeys
-   * @param [String]                processedKeys         The list of processed keys which are described within the model description.
+   * @param [String]                processedKeys         The list of processed keys which are described within the
+   *     model description.
    * @param {Object}                preparedOrigin        The prepared JSON origin object.
    * @param {Object}                modelDescription      The current model description object.
    * @param {Object}                childDescriptions     The `__children` property of the current model description.
    * @returns {[String]}
    * @private
    */
-  _getTransferredKeys: function getTransferredKeys (processedKeys, preparedOrigin, modelDescription, childDescriptions) {
+  _getTransferredKeys: function getTransferredKeys (processedKeys, preparedOrigin, modelDescription,
+                                                    childDescriptions) {
     var descriptionValues = compact(oKeys(modelDescription).filter(filterMetaKeyNames).map(function (modelKey) {
       var value = modelDescription[modelKey];
 
@@ -236,7 +243,8 @@ module.exports = {
     }));
 
     oKeys(childDescriptions).forEach(function (childPropertyKey) {
-      var sanitizedChildPropertyKey = modelDescription[childPropertyKey] && modelDescription[childPropertyKey].split('.')[0];
+      var sanitizedChildPropertyKey = modelDescription[childPropertyKey] && modelDescription[childPropertyKey].split(
+              '.')[0];
 
       if (sanitizedChildPropertyKey) {
         descriptionValues.push(sanitizedChildPropertyKey);

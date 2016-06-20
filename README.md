@@ -14,14 +14,14 @@ There are a few "switches" and "directives" which are unique to each `modelDescr
 how to process the incoming JSON object. All model descriptions are nestable (as each model description could have a infinite
 number of nested `__children`).
 
-```
-{
-  __namespace: String, // the "namespace" of the incoming JSON (if the values you want are "nested") - __namespace can be nested
-  __children: Object, // an object which holds at least one child model description - __children can be nested
-  __transferKeys: Boolean // tell cherrypie.js to only process the described properties and take the others "as is"
-  __serializable: [String] // the list of serializable properties when `model.serialize` is called
-}
-```
+|Directive|Type|Description|
+|---------|----|-----------|
+|__namespace|`String`| The "namespace" of the incoming JSON (if the values you want are "nested") - __namespace can be nested|
+|__children|`Object`| An object which holds at least one child model description - __children can be nested|
+|__serializable|`[String]`| The list of serializable properties when `model.serialize` is called|
+|__transferKeys|`Boolean`| Tell `cherrypie.js` to only process the described properties and take others "as is"|
+|__ignoredKeys|`[String]`| Use this directive in conjunction with `__transferKeys` so that you don't have to declare and endless amount of properties only to have 1 or 2 properties skipped|
+
 
 ##JSON-to-Rich-Model Examples
 

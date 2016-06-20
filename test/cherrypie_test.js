@@ -235,46 +235,47 @@ describe("cherrypie", function () {
     });
 
 
-    it("Should proceed even if the model-description with computed properties has the wrong namespace configured", function () {
-      var origin = {
-            any: {
-              evil: {
-                person: 'Jason'
-              }
-            }
-          },
-          description = {
-            __namespace: 'session.user',
+    it("Should proceed even if the model-description with computed properties has the wrong namespace configured",
+        function () {
+          var origin = {
+                any: {
+                  evil: {
+                    person: 'Jason'
+                  }
+                }
+              },
+              description = {
+                __namespace: 'session.user',
 
-            comments: function (preparedOrigin, namespaceExtractor, populate) {
-              var comments = preparedOrigin.comments,
-                  commentDescripton = {
-                    id: 'commentId',
-                    text: 'commentText'
-                  },
-                  preparedComments = null;
+                comments: function (preparedOrigin, namespaceExtractor, populate) {
+                  var comments = preparedOrigin.comments,
+                      commentDescripton = {
+                        id: 'commentId',
+                        text: 'commentText'
+                      },
+                      preparedComments = null;
 
-              if (comments) {
-                preparedComments = [];
-                comments.forEach(function (comment) {
-                  preparedComments.push(populate(commentDescripton, comment));
-                });
-              }
+                  if (comments) {
+                    preparedComments = [];
+                    comments.forEach(function (comment) {
+                      preparedComments.push(populate(commentDescripton, comment));
+                    });
+                  }
 
-              return preparedComments;
-            }
-          },
+                  return preparedComments;
+                }
+              },
 
-          expectedModel = {
-            comments: null
-          },
+              expectedModel = {
+                comments: null
+              },
 
-          model;
+              model;
 
-      model = cherrypie.populate(description, origin);
+          model = cherrypie.populate(description, origin);
 
-      should(model).eql(expectedModel);
-    });
+          should(model).eql(expectedModel);
+        });
 
     it("Should not get the namespace if the model-description has a wrong namespace configured", function () {
       var origin = {
@@ -620,11 +621,12 @@ describe("cherrypie", function () {
       should(cherrypie.populate.bind(this, modelDescription, origin)).throw(Error);
     });
 
-    it('should populate a model and respect the `__transferKeys` property in order to only overwrite the properties in the defined model description', function () {
-      var someFun = function someFun (arg1, arg2) {
-        return arg1 + arg2;
-      };
-      var origin = {
+    it('should populate a model and respect the `__transferKeys` property in order to only overwrite the properties in the defined model description',
+        function () {
+          var someFun = function someFun (arg1, arg2) {
+            return arg1 + arg2;
+          };
+          var origin = {
             session: {
               sessionName: "Authentication",
               sessionId: 2016,
@@ -663,6 +665,65 @@ describe("cherrypie", function () {
             }
           };
           var model = cherrypie.populate(modelDescription, origin);
+
+          should(model).deepEqual(expectedModel);
+        });
+
+    it('Should skip the specified `__ignoredKeys` when creating the model', function () {
+      var someFun = function someFun (arg1, arg2) {
+        return arg1 + arg2;
+      };
+      var origin = {
+        session: {
+          sessionName: "Authentication",
+          sessionId: 2016,
+          someCrudeProperty: 'really crude things happen to me',
+          someFun: someFun,
+          detail: {
+            actions: [{
+              actionId: 1,
+              name: "login",
+              result: "yeehaa!",
+              _internal: 'internal1',
+              _unused: 'unused'
+            }, {
+              actionId: 2,
+              name: "logout",
+              result: "bye, bye!",
+              _internal: 'internal2',
+              _unused: 'unsung'
+            }]
+          }
+        }
+      };
+      var modelDescription = {
+        __namespace: 'session',
+        __transferKeys: true,
+        name: 'sessionName',
+        actions: 'detail.actions',
+        __children: {
+          actions: {
+            __transferKeys: true,
+            __ignoredKeys: ["actionId", "_unused"]
+          }
+        }
+      };
+      var expectedModel = {
+        name: 'Authentication',
+        sessionId: 2016,
+        someCrudeProperty: 'really crude things happen to me',
+        someFun: someFun,
+        actions: [{
+          name: 'login',
+          result: 'yeehaa!',
+          _internal: 'internal1'
+        }, {
+          name: "logout",
+          result: "bye, bye!",
+          _internal: 'internal2'
+        }]
+      };
+      var model = cherrypie.populate(modelDescription, origin);
 
       should(model).deepEqual(expectedModel);
     });
@@ -907,46 +968,47 @@ describe("cherrypie", function () {
       should(result).eql(expected);
     });
 
-    it("Should desolate a model and ignore child-models if they are not defined in the __serializable array", function () {
-      var modelDescription = {
-            __namespace: 'book',
-            id: 'bookId',
-            title: 'bookTitle',
-            subTitle: 'bookSubTitle',
-            authors: 'bookAuthors',
-            __children: {
-              authors: {
-                id: 'authorId',
-                name: 'authorName',
-                __serializable: ['id', 'name']
-              }
-            },
-            __serializable: ['id', 'title', 'subTitle']
-          },
-          model = {
-            id: 'a0123',
-            title: 'Design Patterns',
-            subTitle: 'Elements of Reusable Object-Oriented Software',
-            authors: [
-              {id: 'asdf1234', name: 'Erich Gamma'},
-              {id: 'asdf1235', name: 'Richard Helm'},
-              {id: 'asdf1236', name: 'Ralph Johnson'},
-              {id: 'asdf1237', name: 'John Vlissides'}
-            ]
-          },
-          expected = {
-            book: {
-              bookId: 'a0123',
-              bookTitle: 'Design Patterns',
-              bookSubTitle: 'Elements of Reusable Object-Oriented Software'
-            }
-          },
-          result;
+    it("Should desolate a model and ignore child-models if they are not defined in the __serializable array",
+        function () {
+          var modelDescription = {
+                __namespace: 'book',
+                id: 'bookId',
+                title: 'bookTitle',
+                subTitle: 'bookSubTitle',
+                authors: 'bookAuthors',
+                __children: {
+                  authors: {
+                    id: 'authorId',
+                    name: 'authorName',
+                    __serializable: ['id', 'name']
+                  }
+                },
+                __serializable: ['id', 'title', 'subTitle']
+              },
+              model = {
+                id: 'a0123',
+                title: 'Design Patterns',
+                subTitle: 'Elements of Reusable Object-Oriented Software',
+                authors: [
+                  {id: 'asdf1234', name: 'Erich Gamma'},
+                  {id: 'asdf1235', name: 'Richard Helm'},
+                  {id: 'asdf1236', name: 'Ralph Johnson'},
+                  {id: 'asdf1237', name: 'John Vlissides'}
+                ]
+              },
+              expected = {
+                book: {
+                  bookId: 'a0123',
+                  bookTitle: 'Design Patterns',
+                  bookSubTitle: 'Elements of Reusable Object-Oriented Software'
+                }
+              },
+              result;
 
-      result = cherrypie.desolate(modelDescription, model);
+          result = cherrypie.desolate(modelDescription, model);
 
-      should(result).eql(expected);
-    });
+          should(result).eql(expected);
+        });
 
     it("Should throw an Error if a 'computedProperty' is found in the __serializable Array", function () {
       var modelDescription = {
