@@ -1,4 +1,4 @@
-#cherrypie.js
+# cherrypie.js
 [![NPM](https://nodei.co/npm/cherrypie.js.png)](https://npmjs.org/package/cherrypie.js)
 [![Build Status](https://travis-ci.org/herom/cherrypie.js.svg?branch=master)](https://travis-ci.org/herom/cherrypie.js)
 [![Coverage Status](https://coveralls.io/repos/github/herom/cherrypie.js/badge.svg?branch=master)](https://coveralls.io/github/herom/cherrypie.js?branch=master)
