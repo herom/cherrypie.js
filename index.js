@@ -14,6 +14,25 @@ function filterMetaKeyNames (name) {
   return !/^__/.test(name);
 }
 
+function checkForInjections (modelDescription) {
+  var injections = modelDescription.__inject;
+  var hasInjections = false;
+
+  if (injections) {
+    var injectionDesc = injections.toString();
+    hasInjections = typeof injections === 'object' && injectionDesc === '[object Object]'; // only accepting POJOs
+
+    if (!hasInjections) {
+      throw new Error(logPrefix +
+          ' The specified `__inject`-property has to be a plain JS Object - you passed "' +
+          injectionDesc +
+          '" instead!');
+    }
+  }
+
+  return hasInjections;
+}
+
 /**
  * Use cherrypie.js to populate models from an (JSON) origin and desolate rich models in an intuitive way.
  *
@@ -37,6 +56,7 @@ module.exports = {
     var childDescriptions = modelDescription.__children || {};
     var shouldTransferKeys = !!modelDescription.__transferKeys;
     var shouldIgnoreKeys = shouldTransferKeys && !!modelDescription.__ignoredKeys;
+    var hasInjections = checkForInjections(modelDescription);
     var transferredKeys = [];
     var keys = oKeys(modelDescription).filter(filterMetaKeyNames);
     var computedProperties = keys.filter(function (key) {
@@ -46,10 +66,12 @@ module.exports = {
 
     keys = diff(keys, computedProperties);
 
-    this._checkForChildren(keys, oKeys(childDescriptions));
+    // this._checkForChildren(keys, oKeys(childDescriptions));
 
     if (shouldTransferKeys) {
       transferredKeys = this._getTransferredKeys(keys, preparedOrigin, modelDescription, childDescriptions);
+    } else {
+      this._checkForChildren(keys, oKeys(childDescriptions));
     }
 
     if (shouldIgnoreKeys) {
@@ -92,6 +114,16 @@ module.exports = {
       computedProperties.forEach(function (key) {
         model[key] = null;
       });
+    }
+
+    if (hasInjections) {
+      var injectObj = modelDescription.__inject;
+
+      for (var injectionKey in injectObj) {
+        if (injectObj.hasOwnProperty(injectionKey)) {
+          model[injectionKey] = injectObj[injectionKey];
+        }
+      }
     }
 
     if (!oKeys(model).length) {

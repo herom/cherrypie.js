@@ -18,14 +18,74 @@ number of nested `__children`).
 |---------|----|-----------|
 |__namespace|`String`| The "namespace" of the incoming JSON (if the values you want are "nested") - __namespace can be nested|
 |__children|`Object`| An object which holds at least one child model description - __children can be nested|
+|__inject :sparkles:|`Object`| An object of properties which should be injected "as is" during model population|
 |__serializable|`[String]`| The list of serializable properties when `model.serialize` is called|
 |__transferKeys|`Boolean`| Tell `cherrypie.js` to only process the described properties and take others "as is"|
 |__ignoredKeys|`[String]`| Use this directive in conjunction with `__transferKeys` so that you don't have to declare and endless amount of properties only to have 1 or 2 properties skipped|
 
 
-##JSON-to-Rich-Model Examples
+## JSON-to-Rich-Model Examples
 
-###Parse values from JSON
+### Simple usage
+Received JSON (to "parse")
+```
+{
+  "name": "Bruce Wayne",
+  "nick": "Batman"
+}
+```
+
+Model Description ("parse" information)
+```
+{
+  pseudonym: 'name',
+  superheroName: 'nickname'
+}
+```
+
+Populated Model ("parsed")
+```
+{
+  pseudonym: 'Bruce Wayne',
+  superheroName: 'Batman'
+}
+```
+
+### Inject Properties during "population" time
+Received JSON (to "parse")
+```
+{
+  "name": "Bruce Wayne",
+  "nick": "Batman"
+}
+```
+
+Injections (properties which should get added to the populated object - no need to touch the populated model anymore)
+```
+var injectedFriends = ['Alfred'];
+```
+
+Model Description ("parse" information)
+```
+{
+  pseudonym: 'name',
+  superheroName: 'nickname',
+  __inject: {
+    friends: injectedFriends
+  }
+}
+```
+
+Populated Model ("parsed")
+```
+{
+  pseudonym: 'Bruce Wayne',
+  superheroName: 'Batman',
+  friends: ['Alfred']
+}
+```
+
+### Parse values from JSON
 
 Received JSON:
 ```
@@ -59,7 +119,7 @@ Populated Model:
 ```
 
 
-###Parse computed values from JSON
+### Parse computed values from JSON
 
 Received JSON:
 ```
@@ -135,7 +195,7 @@ Populated Model:
 }
 ```
 
-###Parse computed values from JSON with minimal model description
+### Parse computed values from JSON with minimal model description
 
 Received JSON:
 ```
@@ -172,7 +232,7 @@ Populated Model:
 }
 ```
 
-###Parse properties using child model-descriptions from JSON
+### Parse properties using child model-descriptions from JSON
 
 Received JSON:
 ```
@@ -241,7 +301,7 @@ Populated Model:
 }
 ```
 
-###Parse and process only the described properties and take the others "as is"
+### Parse and process only the described properties and take the others "as is"
 
 Make use of the `__transferKeys` switch in order to tell `cherrypie.js` to process the descriptions
 given by the `modelDescription` and transfer the keys which are not explicitly described "as is" from
@@ -309,8 +369,8 @@ Populated Model:
 ```
 
 
-##Rich-Model-to-JSON Examples
-###Reduce a "rich" model
+## Rich-Model-to-JSON Examples
+### Reduce a "rich" model
 
 Model Description:
 ```
@@ -334,6 +394,6 @@ Reduced/desolated Model:
 }
 ```
 
-##Contribute
+## Contribute
 If you want to contribute, feel free to raise an issue or open a pull request - I'm glad
 if my idea fits your needs ;)

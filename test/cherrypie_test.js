@@ -25,6 +25,27 @@ describe("cherrypie", function () {
         result.should.have.property('running', 'hooray');
       });
 
+      it("Should work without a 'namespace' and work from the object 'root'", function () {
+        var origin = {
+          name: 'Bruce Wayne',
+          nickname: 'Batman'
+        };
+
+        var description = {
+          pseudonym: 'name',
+          superheroName: 'nickname'
+        };
+
+        var expected = {
+          pseudonym: 'Bruce Wayne',
+          superheroName: 'Batman'
+        };
+
+        var populated = cherrypie.populate(description, origin);
+
+        should(populated).eql(expected);
+      });
+
       it("Should return 'primitive' properties from String values", function () {
         var response = {
               system: {
@@ -183,6 +204,46 @@ describe("cherrypie", function () {
 
         should(model).eql(expectedModel);
       });
+
+      it("Should respect an `__inject` object (injected properties) within the model description", function () {
+        var origin = {
+          session: {
+            state: 1
+          },
+          user: 'user'
+        };
+
+        var injection = 42;
+
+        var modelDescription = {
+          __transferKeys: true,
+          __inject: {
+            theAnswer: injection
+          }
+        };
+
+        var expected = {
+          session: {
+            state: 1
+          },
+          user: 'user',
+          theAnswer: 42
+        };
+
+        var populated = cherrypie.populate(modelDescription, origin);
+
+        should(populated).eql(expected);
+      });
+    });
+
+    it("Should throw an error if the given `__inject` property is not a POJO", function () {
+      var origin = {count: 42};
+      var description = {
+        __transferKeys: true,
+        __inject: [7, 111]
+      };
+
+      should.throws(cherrypie.populate.bind(cherrypie, description, origin), Error);
     });
 
     describe('computed properties', function () {
